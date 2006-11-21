@@ -1,0 +1,8 @@
+setup.py
+src/rdfadict/__init__.py
+src/rdfadict.egg-info/PKG-INFO
+src/rdfadict.egg-info/SOURCES.txt
+src/rdfadict.egg-info/dependency_links.txt
+src/rdfadict.egg-info/requires.txt
+src/rdfadict.egg-info/top_level.txt
+src/rdfadict.egg-info/zip-safe

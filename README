@@ -1,0 +1,97 @@
+========
+rdfadict
+========
+
+:Date: $LastChangedDate$
+:Version: $LastChangedRevision$
+:Author: Nathan R. Yergler <nathan@creativecommons.org>
+:Organization: `Creative Commons <http://creativecommons.org>`_
+:Copyright: 
+   2006, Nathan R. Yergler, Creative Commons; 
+   licensed to the public under the `MIT license 
+   <http://opensource.org/licenses/mit-license.php>`_.
+
+Installation
+------------
+
+rdfadict and its dependencies may be installed using `easy_install 
+<http://peak.telecommunity.com/DevCenter/EasyInstall>`_ (recommended) ::
+
+  $ easy_install rdfadict
+
+or by using the standard distutils setup.py::
+
+  $ python setup.py install
+
+If installing using setup.py, `lxml <http://codespeak.net/lxml>`_ 
+will also need to be installed.
+
+Usage
+-----
+
+**rdfadict** parses RDFa metadata encoded in HTML or XHTML documents.  It can
+parse a block of text (as a string), or a URL.  For example, given the 
+following block of sample text::
+
+  >>> rdfa_sample = """
+  ... <h1 property="dc:title">Vacation in the South of France</h1>
+  ... <h2>created 
+  ... by <span property="dc:creator">Mark Birbeck</span>
+  ... on <span property="dc:date" type="xsd:date"
+  ...          content="2006-01-02">
+  ...   January 2nd, 2006
+  ...    </span>
+  ... </h2>"""
+
+We'll import ``pprint`` so our output is reasonably formatted:
+
+  >>> from pprint import pprint
+
+Triples can be extracted using **rdfadict**::
+
+  >>> import rdfadict
+  >>> base_uri = "http://example.com/rdfadict/"
+  >>> parser = rdfadict.RdfaParser()
+  >>> triples = parser.parsestring(rdfa_sample, base_uri)
+
+We define the variable ``base_uri`` to let the parser know what URI assertions
+without subjects apply to.  
+
+Based on our example text, we expect to get three triples back -- title, 
+creator and date.  Triple are indexed as a dictionary, first by subject,
+then by predicate, finally retuning a ``list`` of objects.  For example, 
+a list of all subjects is retrieved using::
+
+  >>> triples.keys()
+  ['http://example.com/rdfadict/']
+
+If assertions were made about resources other than the default, those URIs
+would appear in this list.  We can verify how many predicates were found
+for this subject by accessing the next level of the dictionary::
+
+  >>> len(triples['http://example.com/rdfadict/'].keys())
+  3
+
+Finally, we can retrieve the value for the title by fully dereferencing
+the dictionary::
+
+  >>> triples['http://example.com/rdfadict/'][
+  ...     'http://purl.org/dc/elements/1.1/title']
+  ['Vacation in the South of France']
+
+Note that the objects are stored as a list by the default triple sink.
+
+Limitations and Known Issues
+----------------------------
+
+**rdfadict** currently does not implement the following areas properly:
+
+* Namespaces are expanded, but the triples passed to the sink are fully 
+  qualifed.  The sink should receive some notification of namespaces
+  (or be able to assert whether it wants to have shortened or fully
+  qualified triples URIs passed in).
+* The ``class`` attribute (used to make ``rdf:type`` assertions) is not
+  parsed.
+* The ``type`` attribute (used to assert the datatype) is not implemented.
+* Subject resolution for ``<meta>`` and ``<link>`` tags (which does not 
+  traverse up the entire DOM tree) is not correctly implemented.
