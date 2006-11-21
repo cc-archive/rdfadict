@@ -20,25 +20,23 @@
 
 import urllib
 import urlparse
-import UserList
-import UserDict
 
 import lxml.etree
 
-class SimpleTripleSink(UserList.UserList):
+class SimpleTripleSink(list):
     """A bare-bones Triple sink that just stores them as a list of tuples."""
 
     def triple(self, s, p, o):
 
-        self.data.append( (s,p,o) )
+        self.append( (s,p,o) )
 
-class DictTripleSink(UserDict.UserDict):
+class DictTripleSink(dict):
 
     def triple(self, s, p, o):
         """Add a triple [s, p, o] to the triple dictionary."""
 
-        self.data.setdefault(s, {}).setdefault(p, [])
-        self.data[s][p].append(o)
+        self.setdefault(s, {}).setdefault(p, [])
+        self[s][p].append(o)
 
 class RdfaParser(object):
 
@@ -64,7 +62,7 @@ class RdfaParser(object):
                         None:'http://www.w3.org/1999/xhtml',
                         }
 
-    def parsestring(self, in_string, base_uri):
+    def parsestring(self, in_string, base_uri, sink=DictTripleSink()):
 
         try:
             lxml_doc = lxml.etree.fromstring(in_string)
@@ -74,12 +72,12 @@ class RdfaParser(object):
             lxml_doc = lxml.etree.fromstring(in_string,
                                              lxml.etree.HTMLParser())
 
-        return self.__parse(lxml_doc, base_uri)
+        return self.__parse(lxml_doc, base_uri, sink)
 
-    def parseurl(self, url):
+    def parseurl(self, url, sink=DictTripleSink()):
         """Retrieve a URL and parse RDFa contained within it."""
 
-        return self.parsestring(urllib.urlopen(url).read(), url)
+        return self.parsestring(urllib.urlopen(url).read(), url, sink)
 
     def __resolve_subject(self, node):
 
