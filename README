@@ -12,7 +12,7 @@ rdfadict
    <http://opensource.org/licenses/mit-license.php>`_.
 
 Installation
-------------
+************
 
 rdfadict and its dependencies may be installed using `easy_install 
 <http://peak.telecommunity.com/DevCenter/EasyInstall>`_ (recommended) ::
@@ -27,7 +27,7 @@ If installing using setup.py, `lxml <http://codespeak.net/lxml>`_
 will also need to be installed.
 
 Usage
------
+*****
 
 **rdfadict** parses RDFa metadata encoded in HTML or XHTML documents.  It can
 parse a block of text (as a string), or a URL.  For example, given the 
@@ -81,8 +81,40 @@ the dictionary::
 
 Note that the objects are stored as a list by the default triple sink.
 
+Triple Sinks
+============
+
+**rdfadict** uses a simple interface (the triple sink) to pass RDF triples
+extracted back to some storage mechanism.  A class which acts as a triple
+sink only needs to define a single method, ``triple``.  For example::
+
+   class StdOutTripleSink(object):
+       """A triple sink which prints out the triples as they are received."""
+
+       def triple(self, subject, predicate, object):
+           """Process the given triple."""
+
+           print subject, predicate, object
+
+The default triple sink models the triples as a nested dictionary, 
+as described above.  Also included with the package is a list triple sink,
+which stores the triples as a list of 3-tuples.  To use a different sink,
+pass an instance in as the ``sink`` parameter to either parse method.  For
+example::
+
+   >>> parser = rdfadict.RdfaParser()
+   >>> list_sink = rdfadict.SimpleTripleSink()
+   >>> parser.parsestring(rdfa_sample, base_uri, sink=list_sink)
+   [('http://example.com/rdfadict/', 'http://purl.org/dc/elements/1.1/title', 'Vacation in the South of France'), ('http://example.com/rdfadict/', 'http://purl.org/dc/elements/1.1/creator', 'Mark Birbeck'), ('http://example.com/rdfadict/', 'http://purl.org/dc/elements/1.1/date', '2006-01-02')]
+
+   >>> len(list_sink)
+   3
+
+Note that the parse method returns the sink used.  Since the sink we're using
+is really just a ``list``, the interpreter prints the contents upon return.
+
 Limitations and Known Issues
-----------------------------
+****************************
 
 **rdfadict** currently does not implement the following areas properly:
 

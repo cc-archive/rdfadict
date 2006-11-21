@@ -1,0 +1,15 @@
+Change History
+**************
+
+0.2 (2006-11-21)
+================
+
+* Directly subclass list and dict for our sample triple sinks
+* Additional package metadata for PyPI
+* Additional documentation of sink interface and tests for the SimpleTripleSink
+
+0.1 (2006-11-20)
+================
+
+* Initial public release
+

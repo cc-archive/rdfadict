@@ -18,28 +18,38 @@
 ## FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ## DEALINGS IN THE SOFTWARE.
 
+import os
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
+def read(*rnames):
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
 setup(
     name = "rdfadict",
-    version = "0.1",
+    version = "0.2",
     packages = ['rdfadict'],
     package_dir = {'':'src'},
 
-    # scripts and dependencies
     install_requires = ['setuptools',
                         'lxml',
                         ],
     include_package_data = True,
     zip_safe = True,
 
-    # author metadata
     author = 'Nathan R. Yergler',
     author_email = 'nathan@creativecommons.org',
     description = 'Simple RDFa parser and dictionary-like interface.',
+    long_description=(
+         read('README')
+         + '\n' +
+         read('CHANGES')
+         + '\n' +
+         'Download\n'
+         '********\n'
+         ),
     license = 'MIT',
     url = 'http://wiki.creativecommons.org/RdfaDict',
 

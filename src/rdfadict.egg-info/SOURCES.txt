@@ -1,4 +1,7 @@
+CHANGES
+README
 setup.py
+test.py
 src/rdfadict/__init__.py
 src/rdfadict.egg-info/PKG-INFO
 src/rdfadict.egg-info/SOURCES.txt
