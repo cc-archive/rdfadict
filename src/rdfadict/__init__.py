@@ -48,20 +48,21 @@ class RdfaParser(object):
         """Reset the parser, forgetting about b-nodes, etc."""
 
         self.__bnodes = {}
-        self.__nsmap = {'cc':'http://web.resource.org/cc/',
-                        'dc':'http://purl.org/dc/elements/1.1/',
-                        'ex':'http://example.org/',
-                        'foaf':'http://xmlns.com/foaf/0.1/',
-                        'rdf':'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                        'rdfs':'http://www.w3.org/2000/01/rdf-schema#',
-                        'svg':'http://www.w3.org/2000/svg',
-                        'xh11':'http://www.w3.org/1999/xhtml',
-                        'xsd':'http://www.w3.org/2001/XMLSchema#',
-                        'biblio':'http://example.org/biblio/0.1',
-                        'taxo':'http://purl.org/rss/1.0/modules/taxonomy/',
-                        None:'http://www.w3.org/1999/xhtml',
+        self.__nsmap = {None:'http://www.w3.org/1999/xhtml',
                         }
 
+##                         'cc':'http://web.resource.org/cc/',
+##                         'dc':'http://purl.org/dc/elements/1.1/',
+##                         'ex':'http://example.org/',
+##                         'foaf':'http://xmlns.com/foaf/0.1/',
+##                         'rdf':'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+##                         'rdfs':'http://www.w3.org/2000/01/rdf-schema#',
+##                         'svg':'http://www.w3.org/2000/svg',
+##                         'xh11':'http://www.w3.org/1999/xhtml',
+##                         'xsd':'http://www.w3.org/2001/XMLSchema#',
+##                         'biblio':'http://example.org/biblio/0.1',
+##                         'taxo':'http://purl.org/rss/1.0/modules/taxonomy/',
+                        
     def parsestring(self, in_string, base_uri, sink=DictTripleSink()):
 
         try:
@@ -81,8 +82,22 @@ class RdfaParser(object):
 
     def __resolve_subject(self, node):
 
-        # XXX check for meta or link which don't traverse up the entire tree
+        # check for meta or link which don't traverse up the entire tree
+        if node.tag in ('link', 'meta'):
+            # look for an about attribute on the node or its parent
+            explicit_parent = node.attrib.get('about',
+                                              (node.getparent() and
+                                               node.getparent().attrib.get(
+                'about', False)))
 
+            if explicit_parent:
+                return self.__resolve_uri(explicit_parent)
+            else:
+                # no explicitly defined parent, perform reification
+                # XXX Does not handle head in XHTML2 docs; see 4.3.3.1 in spec
+                raise NotImplementedError("reification not supported.")
+                
+        # traverse up tree looking for an about tag
         about_nodes = node.xpath('ancestor-or-self::*/@about')
         if about_nodes:
             return self.__resolve_uri(about_nodes[-1])
