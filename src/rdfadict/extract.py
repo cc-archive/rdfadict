@@ -18,14 +18,16 @@
 ## FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ## DEALINGS IN THE SOFTWARE.
 
-from rdfa import RdfaParser
+"""Extraction interface compatible with the ccrdf extractor entry point."""
 
-if __name__ == '__main__':
+from rdfadict.rdfa import RdfaParser
+from rdfadict.sink import ccrdf
 
-    import pprint
-    
+def extract(text, url):
+    """Extract RDFa triples from the provided [text], assuming it was
+    retrieved from [url].  Return an rdfstore object."""
+
     parser = RdfaParser()
-    triples = parser.parseurl("http://rdfa.info")
-    print triples
-    
-    
+    sink = parser.parserstring(text, url, ccrdf.RdfStoreSink())
+
+    return sink

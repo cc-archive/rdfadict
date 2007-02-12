@@ -18,14 +18,16 @@
 ## FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ## DEALINGS IN THE SOFTWARE.
 
-from rdfa import RdfaParser
+"""Triple sink based on ccrdf's RDF Store."""
 
-if __name__ == '__main__':
+import ccrdf.rdfdict
 
-    import pprint
-    
-    parser = RdfaParser()
-    triples = parser.parseurl("http://rdfa.info")
-    print triples
-    
-    
+class RdfStoreSink(ccrdf.rdfdict.rdfStore):
+
+    def __init__(self):
+        super(RdfStoreSink, self).__init__()
+
+    def triple(self, s, p, o):
+
+        self.store.add( (s,p,o) )
+

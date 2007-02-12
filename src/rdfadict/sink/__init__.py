@@ -18,14 +18,19 @@
 ## FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ## DEALINGS IN THE SOFTWARE.
 
-from rdfa import RdfaParser
+"""Simply triple Sink objects."""
 
-if __name__ == '__main__':
+class SimpleTripleSink(list):
+    """A bare-bones Triple sink that just stores them as a list of tuples."""
 
-    import pprint
-    
-    parser = RdfaParser()
-    triples = parser.parseurl("http://rdfa.info")
-    print triples
-    
-    
+    def triple(self, s, p, o):
+
+        self.append( (s,p,o) )
+
+class DictTripleSink(dict):
+
+    def triple(self, s, p, o):
+        """Add a triple [s, p, o] to the triple dictionary."""
+
+        self.setdefault(s, {}).setdefault(p, [])
+        self[s][p].append(o)
