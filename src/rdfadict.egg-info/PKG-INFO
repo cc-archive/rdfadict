@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: rdfadict
-Version: 0.2
+Version: 0.3a3
 Summary: Simple RDFa parser and dictionary-like interface.
 Home-page: http://wiki.creativecommons.org/RdfaDict
 Author: Nathan R. Yergler
@@ -10,8 +10,8 @@ Description: ========
         rdfadict
         ========
         
-        :Date: $LastChangedDate: 2006-11-21 10:14:07 -0500 (Tue, 21 Nov 2006) $
-        :Version: $LastChangedRevision: 4732 $
+        :Date: $LastChangedDate: 2006-11-21 11:23:54 -0500 (Tue, 21 Nov 2006) $
+        :Version: $LastChangedRevision: 4737 $
         :Author: Nathan R. Yergler <nathan@creativecommons.org>
         :Organization: `Creative Commons <http://creativecommons.org>`_
         :Copyright:
@@ -42,7 +42,7 @@ Description: ========
         following block of sample text::
         
         >>> rdfa_sample = """
-        ... <h1 property="dc:title">Vacation in the South of France</h1>
+        ... <h1 xmlns:dc="http://purl.org/dc/elements/1.1/" property="dc:title">Vacation in the South of France</h1>
         ... <h2>created
         ... by <span property="dc:creator">Mark Birbeck</span>
         ... on <span property="dc:date" type="xsd:date"
@@ -110,8 +110,9 @@ Description: ========
         pass an instance in as the ``sink`` parameter to either parse method.  For
         example::
         
+        >>> import rdfadict.sink
         >>> parser = rdfadict.RdfaParser()
-        >>> list_sink = rdfadict.SimpleTripleSink()
+        >>> list_sink = rdfadict.sink.SimpleTripleSink()
         >>> parser.parsestring(rdfa_sample, base_uri, sink=list_sink)
         [('http://example.com/rdfadict/', 'http://purl.org/dc/elements/1.1/title', 'Vacation in the South of France'), ('http://example.com/rdfadict/', 'http://purl.org/dc/elements/1.1/creator', 'Mark Birbeck'), ('http://example.com/rdfadict/', 'http://purl.org/dc/elements/1.1/date', '2006-01-02')]
         
@@ -130,14 +131,24 @@ Description: ========
         qualifed.  The sink should receive some notification of namespaces
         (or be able to assert whether it wants to have shortened or fully
         qualified triples URIs passed in).
+        * Subject resolution for ``<link>`` and ``<meta>`` tags in XHTML2
+        ``<head>`` is not correctly implemented.
         * The ``class`` attribute (used to make ``rdf:type`` assertions) is not
         parsed.
-        * The ``type`` attribute (used to assert the datatype) is not implemented.
-        * Subject resolution for ``<meta>`` and ``<link>`` tags (which does not
-        traverse up the entire DOM tree) is not correctly implemented.
-        
+        * The ``datatype`` attribute (used to assert the datatype) is not implemented.
+        * Reification is not supported.
         Change History
         **************
+        
+        0.3 (in progress)
+        =================
+        
+        0.3a2
+        -----
+        
+        * Corrected subject resolution behavior for <link> and <meta> elements
+        * Implemented entry point and extractor interface for compatibility with the
+        ccrdf.rdfextract library.
         
         0.2 (2006-11-21)
         ================

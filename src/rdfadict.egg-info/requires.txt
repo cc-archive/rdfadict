@@ -1,2 +1,5 @@
 setuptools
 lxml
+
+[ccrdf]
+ccrdf>=0.6a1
