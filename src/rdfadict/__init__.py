@@ -20,6 +20,15 @@
 
 from rdfa import RdfaParser
 
+def extract(text, url, graph):
+    """ccrdf.extract_to_graph entry point for providing RDFa extraction
+    to the ccrdf.rdfextract library."""
+
+    from rdfadict.sink.graph import GraphSink
+    
+    parser = RdfaParser()
+    parser.parsestring(text, url, sink=GraphSink(graph))
+    
 if __name__ == '__main__':
 
     import pprint
