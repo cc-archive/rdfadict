@@ -22,6 +22,17 @@
 
 import ccrdf.rdfdict
 
+class GraphSink(object):
+    """A triple sink which adds new triples to an existing graph."""
+
+    def __init__(self, graph):
+        self.graph = graph
+
+    def triple(self, s, p, o):
+
+        self.graph.add( (s,p,o) )
+
+        
 class RdfStoreSink(ccrdf.rdfdict.rdfStore):
 
     def __init__(self):
