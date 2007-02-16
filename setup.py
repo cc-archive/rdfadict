@@ -29,13 +29,18 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.2",
+    version = "0.3a3",
     packages = ['rdfadict'],
     package_dir = {'':'src'},
 
+    entry_points = {'ccrdf.extract_to_graph':'rdfa = rdfadict:extract [ccrdf]',
+                    'console_scripts' : ['test = test:test']},
+    
     install_requires = ['setuptools',
                         'lxml',
                         ],
+    extras_require = {'ccrdf':'ccrdf>=0.6a3'},
+    
     include_package_data = True,
     zip_safe = True,
 
