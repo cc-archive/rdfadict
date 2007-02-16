@@ -36,9 +36,11 @@ class RdfaParser(object):
         """Reset the parser, forgetting about b-nodes, etc."""
 
         self.__bnodes = {}
-        self.__nsmap = {None:'http://www.w3.org/1999/xhtml',
-                        }
-
+        self.__nsmap = {}
+        
+##        self.__nsmap = {None:'http://www.w3.org/1999/xhtml',
+##                        }
+##
 ##                         'cc':'http://web.resource.org/cc/',
 ##                         'dc':'http://purl.org/dc/elements/1.1/',
 ##                         'ex':'http://example.org/',
@@ -73,32 +75,46 @@ class RdfaParser(object):
         # check for meta or link which don't traverse up the entire tree
         if node.tag in ('link', 'meta'):
             # look for an about attribute on the node or its parent
-            explicit_parent = node.attrib.get('about',
-                                              (node.getparent() and
-                                               node.getparent().attrib.get(
-                'about', False)))
+            if node.attrib.get('about', False):
+                explicit_parent = node
+            elif node.getparent().attrib.get('about', False):
+                explicit_parent = node.getparent()
+            else:
+                explicit_parent = False
 
             if explicit_parent:
-                return self.__resolve_uri(explicit_parent)
+                return self.__resolve_uri(explicit_parent.attrib['about'],
+                                          explicit_parent)
             else:
                 # XXX Does not handle head in XHTML2 docs; see 4.3.3.1 in spec
                 # no explicitly defined parent, perform reification
                 raise AttributeError("Unable to resolve subject for node.")
             
         # traverse up tree looking for an about tag
-        about_nodes = node.xpath('ancestor-or-self::*/@about')
+        about_nodes = node.xpath('ancestor-or-self::*[@about]')
         if about_nodes:
-            return self.__resolve_uri(about_nodes[-1])
+            return self.__resolve_uri(about_nodes[-1].attrib['about'],
+                                      about_nodes[-1])
         else:
             return None
 
-    def __resolve_uri(self, curie_or_uri):
-
+    def __resolve_uri(self, curie_or_uri, context=None):
+        """Convert a compact URI (i.e., "cc:license") to a fully-qualified
+        URI.  [context] is an Element or None.  If it is not None, it will
+        be used to resolve local namespace declarations.  If it is None,
+        only the namespaces declared as part of the root element will be
+        available.
+        """
+        
         # is this already a uri?
         url_pieces = urlparse.urlparse(curie_or_uri)
         if '' not in [url_pieces[0], url_pieces[1]]:
 
             # already a valid URI
+            return curie_or_uri
+
+        # is this a urn?
+        if (len(curie_or_uri) >= 4) and curie_or_uri.lower()[:4] == "urn:":
             return curie_or_uri
 
         # resolve it using our namespace map
@@ -109,8 +125,12 @@ class RdfaParser(object):
         if ns == '':
             ns = None
 
-        ns = self.__nsmap[ns]
+        if context is not None:
+            ns = context.nsmap[ns]
 
+        else:
+            ns = self.__nsmap[ns]
+            
         if ns[-1] not in ("#", "/"):
             ns = "%s#" % ns
 
@@ -134,24 +154,24 @@ class RdfaParser(object):
             obj = node.attrib.get('content', node.text)
 
             for p in node.attrib.get('property').split():
-                sink.triple( subject, self.__resolve_uri(p), obj )
+                sink.triple( subject, self.__resolve_uri(p, node), obj )
 
         # using rel
         for node in lxml_doc.xpath('//*[@rel]'):
 
             subject = self.__resolve_subject(node) or base_uri
-            obj = self.__resolve_uri(node.attrib.get('href'))
+            obj = self.__resolve_uri(node.attrib.get('href'), node)
 
             for p in node.attrib.get('rel').split():
-                sink.triple( subject, self.__resolve_uri(p), obj )
+                sink.triple( subject, self.__resolve_uri(p, node), obj )
 
         # using rev
         for node in lxml_doc.xpath('//*[@rev]'):
 
             obj = self.__resolve_subject(node) or base_uri
-            subject = self.__resolve_uri(node.attrib.get('href'))
+            subject = self.__resolve_uri(node.attrib.get('href'), node)
 
             for p in note.attrib.get('rel').split():
-                sink.triple( subject, self.__resolve_uri(p), obj )
+                sink.triple( subject, self.__resolve_uri(p, node), obj )
 
         return sink
