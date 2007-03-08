@@ -93,6 +93,56 @@ Note that the objects are stored as a list by the default triple sink.
 Multiple Assertions
 ===================
 
+Because the ``property`` attribute always denotes triple with a literal string
+as its object and ``rel`` and ``rev`` denote triples with URIs as their 
+objects, it is possible to make multiple assertions with a single HTML tag.
+
+For example::
+
+  >>> multi_rdfa = """
+  ... <div xmlns:foaf="http://xmlns.com/foaf/0.1/" 
+  ...      xmlns:dc="http://purl.org/dc/elements/1.1/">
+  ...   This photo was taken by <a about="photo1.jpg" property="dc:title"
+  ...   content="Portrait of Mark" rel="dc:creator"
+  ...   rev="foaf:img" 
+  ...   href="http://www.blogger.com/profile/1109404">Mark Birbeck</a>.
+  ... </div>
+  ... """
+
+In this statement we are making three assertions: two involving URI objects
+(specified by ``rel`` and ``rev``), and one involving the ``property``.
+
+  >>> import rdfadict
+  >>> parser = rdfadict.RdfaParser()
+  >>> multi_base_uri = "http://example.com/multiassert/"
+  >>> triples = parser.parsestring(multi_rdfa, multi_base_uri)
+
+We expect the triples generated to have two subjects: the photo URI (for the 
+``rel`` and ``property`` assertions) and the ``href`` URI (for the ``rev``
+assertion).
+
+  >>> len(triples.keys()) == 2
+  True
+  >>> 'http://example.com/multiassert/photo1.jpg' in triples.keys()
+  True
+  >>> 'http://www.blogger.com/profile/1109404' in triples.keys()
+  True
+
+Finally, we verify that the assertions made about each subject are correct::
+
+  >>> len(triples['http://example.com/multiassert/photo1.jpg'].keys()) == 2
+  True
+  >>> triples['http://example.com/multiassert/photo1.jpg'] \
+  ...          ['http://purl.org/dc/elements/1.1/creator']
+  ['http://www.blogger.com/profile/1109404']
+  >>> triples['http://example.com/multiassert/photo1.jpg'] \
+  ...          ['http://purl.org/dc/elements/1.1/title']
+  ['Portrait of Mark']
+
+  >>> triples['http://www.blogger.com/profile/1109404']
+  {'http://xmlns.com/foaf/0.1/img': ['http://example.com/multiassert/photo1.jpg']}
+
+
 Resolving Statements
 ====================
 
@@ -185,10 +235,14 @@ is really just a ``list``, the interpreter prints the contents upon return.
 Limitations and Known Issues
 ****************************
 
-**rdfadict** currently does not implement the following areas properly:
+**rdfadict** currently does not implement the following areas properly; 
+numbers in parenthesis refer to the section number  in the `RDFa Syntax 
+Document <http://www.w3.org/2006/07/SWD/RDFa/syntax/>`_.
 
-* The ``class`` attribute (used to make ``rdf:type`` assertions) is not
-  parsed.
-* The ``type`` attribute (used to assert the datatype) is not implemented.
-* Subject resolution for ``<meta>`` and ``<link>`` tags (which does not 
-  traverse up the entire DOM tree) is not correctly implemented.
+* ``xml:base`` is not respected (2.3)
+* Typing is not implemented; this includes implicit XMLLiteral typing as well
+  as explicit types specified by the ``datatype`` attribute (5.1)
+* Blank nodes are not guaranteed to work per the syntax document (5.2); if
+  you try to use them, you will probably be disappointed.
+* Reification is not implemented (5.3).
+
