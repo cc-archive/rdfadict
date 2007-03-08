@@ -27,6 +27,8 @@ from rdfadict.sink import DictTripleSink
 
 class RdfaParser(object):
 
+    HTML_RESERVED_WORDS = ('license',)
+
     def __init__(self):
 
         self.reset()
@@ -70,7 +72,7 @@ class RdfaParser(object):
 
         return self.parsestring(urllib.urlopen(url).read(), url, sink)
 
-    def __resolve_subject(self, node):
+    def __resolve_subject(self, node, base_uri):
 
         # check for meta or link which don't traverse up the entire tree
         if node.tag in ('link', 'meta'):
@@ -84,7 +86,7 @@ class RdfaParser(object):
 
             if explicit_parent:
                 return self.__resolve_uri(explicit_parent.attrib['about'],
-                                          explicit_parent)
+                                          base_uri)
             else:
                 # XXX Does not handle head in XHTML2 docs; see 4.3.3.1 in spec
                 # no explicitly defined parent, perform reification
@@ -94,11 +96,17 @@ class RdfaParser(object):
         about_nodes = node.xpath('ancestor-or-self::*[@about]')
         if about_nodes:
             return self.__resolve_uri(about_nodes[-1].attrib['about'],
-                                      about_nodes[-1])
+                                      base_uri)
         else:
             return None
 
-    def __resolve_uri(self, curie_or_uri, context=None):
+    def __resolve_uri(self, uri, base_uri):
+        """Resolve a (possibly) relative URI to an absolute URI.  Handle
+        special cases of HTML reserved words, such as "license"."""
+
+        return urlparse.urljoin(base_uri, uri)
+
+    def __resolve_curie(self, curie_or_uri, context=None):
         """Convert a compact URI (i.e., "cc:license") to a fully-qualified
         URI.  [context] is an Element or None.  If it is not None, it will
         be used to resolve local namespace declarations.  If it is None,
@@ -117,10 +125,16 @@ class RdfaParser(object):
         if (len(curie_or_uri) >= 4) and curie_or_uri.lower()[:4] == "urn:":
             return curie_or_uri
 
-        # resolve it using our namespace map
+        # determine if this CURIE has a namespace
         if ":" not in curie_or_uri:
-            curie_or_uri = ":%s" % curie_or_uri
+            # no namespace; if this isn't a reserved word, we throw it away
+            if curie_or_uri.lower() not in self.HTML_RESERVED_WORDS:
+                return None
+            else:
+                # reserved word; map it to the XHTML namespace
+                return "http://www.w3.org/1999/xhtml#%s" % curie_or_uri
 
+        # resolve it using our namespace map
         ns, path = curie_or_uri.split(':', 1)
         if ns == '':
             ns = None
@@ -150,28 +164,37 @@ class RdfaParser(object):
         # using the property
         for node in lxml_doc.xpath('//*[@property]'):
 
-            subject = self.__resolve_subject(node) or base_uri
+            subject = self.__resolve_subject(node, base_uri) or base_uri
             obj = node.attrib.get('content', node.text)
 
             for p in node.attrib.get('property').split():
-                sink.triple( subject, self.__resolve_uri(p, node), obj )
+                pred = self.__resolve_curie(p, node)
+                if pred is not None:
+                    # the CURIE resolved
+                    sink.triple( subject, pred, obj )
 
         # using rel
         for node in lxml_doc.xpath('//*[@rel]'):
 
-            subject = self.__resolve_subject(node) or base_uri
-            obj = self.__resolve_uri(node.attrib.get('href'), node)
+            subject = self.__resolve_subject(node, base_uri) or base_uri
+            obj = self.__resolve_uri(node.attrib.get('href'), base_uri)
 
             for p in node.attrib.get('rel').split():
-                sink.triple( subject, self.__resolve_uri(p, node), obj )
+                pred = self.__resolve_curie(p, node)
+                if pred is not None:
+                    # the CURIE resolved
+                    sink.triple( subject, pred, obj )
 
         # using rev
         for node in lxml_doc.xpath('//*[@rev]'):
 
-            obj = self.__resolve_subject(node) or base_uri
-            subject = self.__resolve_uri(node.attrib.get('href'), node)
+            obj = self.__resolve_subject(node, base_uri) or base_uri
+            subject = self.__resolve_uri(node.attrib.get('href'), base_uri)
 
             for p in note.attrib.get('rel').split():
-                sink.triple( subject, self.__resolve_uri(p, node), obj )
+                pred = self.__resolve_curie(p, node)
+                if pred is not None:
+                    # the CURIE resolved
+                    sink.triple( subject, pred, obj )
 
         return sink
