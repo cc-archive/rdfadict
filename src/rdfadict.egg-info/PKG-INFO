@@ -1,7 +1,7 @@
 Metadata-Version: 1.0
 Name: rdfadict
-Version: 0.3a3
-Summary: Simple RDFa parser and dictionary-like interface.
+Version: 0.3
+Summary: An RDFa parser wth a simple dictionary-like interface.
 Home-page: http://wiki.creativecommons.org/RdfaDict
 Author: Nathan R. Yergler
 Author-email: nathan@creativecommons.org
@@ -10,14 +10,16 @@ Description: ========
         rdfadict
         ========
         
-        :Date: $LastChangedDate: 2006-11-21 11:23:54 -0500 (Tue, 21 Nov 2006) $
-        :Version: $LastChangedRevision: 4737 $
+        :Date: $LastChangedDate: 2007-03-08 13:18:43 -0500 (Thu, 08 Mar 2007) $
+        :Version: $LastChangedRevision: 5515 $
         :Author: Nathan R. Yergler <nathan@creativecommons.org>
         :Organization: `Creative Commons <http://creativecommons.org>`_
         :Copyright:
         2006, Nathan R. Yergler, Creative Commons;
         licensed to the public under the `MIT license
         <http://opensource.org/licenses/mit-license.php>`_.
+        
+        .. contents::
         
         Installation
         ************
@@ -37,23 +39,30 @@ Description: ========
         Usage
         *****
         
+        .. admonition:: Document Purpose
+        
+        This document is intended to provide a set of literate tests
+        for the ``rdfadict`` package; it is **not** intended to provide thorough
+        coverage of RDFa syntax or semantics.  See the `RDF Primer
+        <http://www.w3.org/2006/07/SWD/RDFa/primer/>`_ or the `RDFa Syntax
+        <http://www.w3.org/2006/07/SWD/RDFa/syntax/>`_ for details on RDFa.
+        
         **rdfadict** parses RDFa metadata encoded in HTML or XHTML documents.  It can
         parse a block of text (as a string), or a URL.  For example, given the
         following block of sample text::
         
         >>> rdfa_sample = """
-        ... <h1 xmlns:dc="http://purl.org/dc/elements/1.1/" property="dc:title">Vacation in the South of France</h1>
+        ... <div xmlns:dc="http://purl.org/dc/elements/1.1/"
+        ...      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        ... <h1 property="dc:title">Vacation in the South of France</h1>
         ... <h2>created
         ... by <span property="dc:creator">Mark Birbeck</span>
         ... on <span property="dc:date" type="xsd:date"
         ...          content="2006-01-02">
         ...   January 2nd, 2006
         ...    </span>
-        ... </h2>"""
-        
-        We'll import ``pprint`` so our output is reasonably formatted:
-        
-        >>> from pprint import pprint
+        ... </h2>
+        ... </div>"""
         
         Triples can be extracted using **rdfadict**::
         
@@ -89,6 +98,116 @@ Description: ========
         
         Note that the objects are stored as a list by the default triple sink.
         
+        Multiple Assertions
+        ===================
+        
+        Because the ``property`` attribute always denotes triple with a literal string
+        as its object and ``rel`` and ``rev`` denote triples with URIs as their
+        objects, it is possible to make multiple assertions with a single HTML tag.
+        
+        For example::
+        
+        >>> multi_rdfa = """
+        ... <div xmlns:foaf="http://xmlns.com/foaf/0.1/"
+        ...      xmlns:dc="http://purl.org/dc/elements/1.1/">
+        ...   This photo was taken by <a about="photo1.jpg" property="dc:title"
+        ...   content="Portrait of Mark" rel="dc:creator"
+        ...   rev="foaf:img"
+        ...   href="http://www.blogger.com/profile/1109404">Mark Birbeck</a>.
+        ... </div>
+        ... """
+        
+        In this statement we are making three assertions: two involving URI objects
+        (specified by ``rel`` and ``rev``), and one involving the ``property``.
+        
+        >>> import rdfadict
+        >>> parser = rdfadict.RdfaParser()
+        >>> multi_base_uri = "http://example.com/multiassert/"
+        >>> triples = parser.parsestring(multi_rdfa, multi_base_uri)
+        
+        We expect the triples generated to have two subjects: the photo URI (for the
+        ``rel`` and ``property`` assertions) and the ``href`` URI (for the ``rev``
+        assertion).
+        
+        >>> len(triples.keys()) == 2
+        True
+        >>> 'http://example.com/multiassert/photo1.jpg' in triples.keys()
+        True
+        >>> 'http://www.blogger.com/profile/1109404' in triples.keys()
+        True
+        
+        Finally, we verify that the assertions made about each subject are correct::
+        
+        >>> len(triples['http://example.com/multiassert/photo1.jpg'].keys()) == 2
+        True
+        >>> triples['http://example.com/multiassert/photo1.jpg'] \
+        ...          ['http://purl.org/dc/elements/1.1/creator']
+        ['http://www.blogger.com/profile/1109404']
+        >>> triples['http://example.com/multiassert/photo1.jpg'] \
+        ...          ['http://purl.org/dc/elements/1.1/title']
+        ['Portrait of Mark']
+        
+        >>> triples['http://www.blogger.com/profile/1109404']
+        {'http://xmlns.com/foaf/0.1/img': ['http://example.com/multiassert/photo1.jpg']}
+        
+        
+        Resolving Statements
+        ====================
+        
+        When resolving statements, the REL, REV, CLASS and PROPERTY attributes expect
+        a `CURIE <http://www.w3.org/2001/sw/BestPractices/HTML/2005-10-21-curie>`_,
+        while the HREF property expects a URI.  When resolving CURIEs, un-namespaced
+        values which are not HTML reserved words (such as license) are ignored to
+        prevent "triple bloat".
+        
+        Given an example::
+        
+        >>> rdfa_sample2 = """
+        ... <div xmlns:dc="http://purl.org/dc/elements/1.1/"
+        ...      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        ... <h1 property="dc:title">Vacation in the South of France</h1>
+        ... <h2>created
+        ... by <span property="dc:creator">Mark Birbeck</span>
+        ... on <span property="dc:date" type="xsd:date"
+        ...          content="2006-01-02">
+        ...   January 2nd, 2006
+        ...    </span>
+        ... </h2>
+        ... <img src="/myphoto.jpg" class="photo" />
+        ... (<a href="http://creativecommons.org/licenses/by/3.0/" rel="license"
+        ...    about="/myphoto.jpg">CC License</a>)
+        ... </div>"""
+        
+        We can extract RDFa triples from it::
+        
+        >>> parser = rdfadict.RdfaParser()
+        >>> base_uri2 = "http://example.com/rdfadict/sample2"
+        >>> triples = parser.parsestring(rdfa_sample2, base_uri2)
+        
+        This block of RDFa includes a license statement about another document, the
+        photo::
+        
+        >>> len(triples["http://example.com/myphoto.jpg"])
+        1
+        
+        >>> triples["http://example.com/myphoto.jpg"].keys()
+        ['http://www.w3.org/1999/xhtml#license']
+        >>> triples["http://example.com/myphoto.jpg"] \
+        ...    ['http://www.w3.org/1999/xhtml#license']
+        ['http://creativecommons.org/licenses/by/3.0/']
+        
+        There are two things to note with respect to this example.  First, the relative
+        URI for the photo is resolved with respect to the ``base_uri`` value.  Second,
+        the "class" attribute is not processed, because it's value is not in a
+        declared namespace::
+        
+        >>> 'photo' in [ n.lower() for n in
+        ...      triples['http://example.com/rdfadict/sample2'].keys() ]
+        False
+        
+        See the `RDFa Primer <http://www.w3.org/2006/07/SWD/RDFa/primer/>`_
+        for more RDFa examples.
+        
         Triple Sinks
         ============
         
@@ -110,7 +229,6 @@ Description: ========
         pass an instance in as the ``sink`` parameter to either parse method.  For
         example::
         
-        >>> import rdfadict.sink
         >>> parser = rdfadict.RdfaParser()
         >>> list_sink = rdfadict.sink.SimpleTripleSink()
         >>> parser.parsestring(rdfa_sample, base_uri, sink=list_sink)
@@ -125,30 +243,31 @@ Description: ========
         Limitations and Known Issues
         ****************************
         
-        **rdfadict** currently does not implement the following areas properly:
+        **rdfadict** currently does not implement the following areas properly;
+        numbers in parenthesis refer to the section number  in the `RDFa Syntax
+        Document <http://www.w3.org/2006/07/SWD/RDFa/syntax/>`_.
         
-        * Namespaces are expanded, but the triples passed to the sink are fully
-        qualifed.  The sink should receive some notification of namespaces
-        (or be able to assert whether it wants to have shortened or fully
-        qualified triples URIs passed in).
-        * Subject resolution for ``<link>`` and ``<meta>`` tags in XHTML2
-        ``<head>`` is not correctly implemented.
-        * The ``class`` attribute (used to make ``rdf:type`` assertions) is not
-        parsed.
-        * The ``datatype`` attribute (used to assert the datatype) is not implemented.
-        * Reification is not supported.
+        * ``xml:base`` is not respected (2.3)
+        * Typing is not implemented; this includes implicit XMLLiteral typing as well
+        as explicit types specified by the ``datatype`` attribute (5.1)
+        * Blank nodes are not guaranteed to work per the syntax document (5.2); if
+        you try to use them, you will probably be disappointed.
+        * Reification is not implemented (5.3).
+        
+        
         Change History
         **************
         
-        0.3 (in progress)
-        =================
+        0.3 (2007-03-08)
+        ================
         
-        0.3a2
-        -----
-        
+        * Fixed resolution of URIs v. CURIEs
+        * Drop assertions with non-namespaced CURIEs as the predicate (per updated spec)
+        * Updated test suite to comply with updated RDFa specification
         * Corrected subject resolution behavior for <link> and <meta> elements
         * Implemented entry point and extractor interface for compatibility with the
         ccrdf.rdfextract library.
+        * Fixed parsing of ``rev`` assertions, which was formerly completely broken.
         
         0.2 (2006-11-21)
         ================

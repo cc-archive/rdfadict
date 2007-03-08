@@ -2,11 +2,11 @@ CHANGES
 README
 buildout.cfg
 setup.py
-test.py
 bootstrap/bootstrap.py
 src/rdfadict/__init__.py
 src/rdfadict/extract.py
 src/rdfadict/rdfa.py
+src/rdfadict/test.py
 src/rdfadict.egg-info/PKG-INFO
 src/rdfadict.egg-info/SOURCES.txt
 src/rdfadict.egg-info/dependency_links.txt
