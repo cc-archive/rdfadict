@@ -41,7 +41,7 @@ Usage
 
 **rdfadict** parses RDFa metadata encoded in HTML or XHTML documents.  It can
 parse a block of text (as a string), or a URL.  For example, given the 
-following block of sample text::
+following block of sample text:
 
   >>> rdfa_sample = """
   ... <div xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -56,7 +56,7 @@ following block of sample text::
   ... </h2>
   ... </div>"""
 
-Triples can be extracted using **rdfadict**::
+Triples can be extracted using **rdfadict**:
 
   >>> import rdfadict
   >>> base_uri = "http://example.com/rdfadict/"
@@ -69,20 +69,20 @@ without subjects apply to.
 Based on our example text, we expect to get three triples back -- title, 
 creator and date.  Triple are indexed as a dictionary, first by subject,
 then by predicate, finally retuning a ``list`` of objects.  For example, 
-a list of all subjects is retrieved using::
+a list of all subjects is retrieved using:
 
   >>> triples.keys()
   ['http://example.com/rdfadict/']
 
 If assertions were made about resources other than the default, those URIs
 would appear in this list.  We can verify how many predicates were found
-for this subject by accessing the next level of the dictionary::
+for this subject by accessing the next level of the dictionary:
 
   >>> len(triples['http://example.com/rdfadict/'].keys())
   3
 
 Finally, we can retrieve the value for the title by fully dereferencing
-the dictionary::
+the dictionary:
 
   >>> triples['http://example.com/rdfadict/'][
   ...     'http://purl.org/dc/elements/1.1/title']
@@ -97,7 +97,7 @@ Because the ``property`` attribute always denotes triple with a literal string
 as its object and ``rel`` and ``rev`` denote triples with URIs as their 
 objects, it is possible to make multiple assertions with a single HTML tag.
 
-For example::
+For example:
 
   >>> multi_rdfa = """
   ... <div xmlns:foaf="http://xmlns.com/foaf/0.1/" 
@@ -128,7 +128,7 @@ assertion).
   >>> 'http://www.blogger.com/profile/1109404' in triples.keys()
   True
 
-Finally, we verify that the assertions made about each subject are correct::
+Finally, we verify that the assertions made about each subject are correct:
 
   >>> len(triples['http://example.com/multiassert/photo1.jpg'].keys()) == 2
   True
@@ -152,7 +152,7 @@ while the HREF property expects a URI.  When resolving CURIEs, un-namespaced
 values which are not HTML reserved words (such as license) are ignored to 
 prevent "triple bloat".
 
-Given an example::
+Given an example:
 
   >>> rdfa_sample2 = """
   ... <div xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -170,14 +170,14 @@ Given an example::
   ...    about="/myphoto.jpg">CC License</a>)
   ... </div>"""
 
-We can extract RDFa triples from it::
+We can extract RDFa triples from it:
 
   >>> parser = rdfadict.RdfaParser()
   >>> base_uri2 = "http://example.com/rdfadict/sample2"
   >>> triples = parser.parsestring(rdfa_sample2, base_uri2)
 
 This block of RDFa includes a license statement about another document, the
-photo::
+photo:
 
   >>> len(triples["http://example.com/myphoto.jpg"])
   1
@@ -191,7 +191,7 @@ photo::
 There are two things to note with respect to this example.  First, the relative
 URI for the photo is resolved with respect to the ``base_uri`` value.  Second,
 the "class" attribute is not processed, because it's value is not in a 
-declared namespace::
+declared namespace:
 
   >>> 'photo' in [ n.lower() for n in
   ...      triples['http://example.com/rdfadict/sample2'].keys() ]
@@ -205,7 +205,7 @@ Triple Sinks
 
 **rdfadict** uses a simple interface (the triple sink) to pass RDF triples
 extracted back to some storage mechanism.  A class which acts as a triple
-sink only needs to define a single method, ``triple``.  For example::
+sink only needs to define a single method, ``triple``.  For example:
 
    class StdOutTripleSink(object):
        """A triple sink which prints out the triples as they are received."""
@@ -219,7 +219,7 @@ The default triple sink models the triples as a nested dictionary,
 as described above.  Also included with the package is a list triple sink,
 which stores the triples as a list of 3-tuples.  To use a different sink,
 pass an instance in as the ``sink`` parameter to either parse method.  For
-example::
+example:
 
    >>> parser = rdfadict.RdfaParser()
    >>> list_sink = rdfadict.sink.SimpleTripleSink()
