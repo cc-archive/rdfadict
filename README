@@ -205,7 +205,7 @@ Triple Sinks
 
 **rdfadict** uses a simple interface (the triple sink) to pass RDF triples
 extracted back to some storage mechanism.  A class which acts as a triple
-sink only needs to define a single method, ``triple``.  For example:
+sink only needs to define a single method, ``triple``.  For example::
 
    class StdOutTripleSink(object):
        """A triple sink which prints out the triples as they are received."""
