@@ -1,4 +1,4 @@
-## Copyright (c) 2006 Nathan R. Yergler, Creative Commons
+## Copyright (c) 2006-2007 Nathan R. Yergler, Creative Commons
 
 ## Permission is hereby granted, free of charge, to any person obtaining
 ## a copy of this software and associated documentation files (the "Software"),
@@ -29,12 +29,12 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.3a3",
+    version = "0.3a4",
     packages = ['rdfadict'],
     package_dir = {'':'src'},
 
     entry_points = {'ccrdf.extract_to_graph':'rdfa = rdfadict:extract [ccrdf]',
-                    'console_scripts' : ['test = test:test']},
+                    'console_scripts' : ['test = rdfadict.test:test']},
     
     install_requires = ['setuptools',
                         'lxml',

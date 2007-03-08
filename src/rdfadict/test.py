@@ -26,11 +26,12 @@ import doctest
 
 def test():
 
-    # fix up the PYTHONPATH
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-
     # run the doctests in README
-    doctest.testfile('README')
+    try:
+        doctest.testfile('README')
+    except IOError:
+        # maybe we're in a check out and README isn't in the cwd
+        doctest.testfile('../../README')
     
 if __name__ == '__main__':
     test()
