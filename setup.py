@@ -29,7 +29,7 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.3a4",
+    version = "0.3",
     packages = ['rdfadict'],
     package_dir = {'':'src'},
 
@@ -46,7 +46,7 @@ setup(
 
     author = 'Nathan R. Yergler',
     author_email = 'nathan@creativecommons.org',
-    description = 'Simple RDFa parser and dictionary-like interface.',
+    description = 'An RDFa parser wth a simple dictionary-like interface.',
     long_description=(
          read('README')
          + '\n' +

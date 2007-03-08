@@ -1,8 +1,8 @@
 Change History
 **************
 
-0.3 (TBD)
-=========
+0.3 (2007-03-08)
+================
 
 * Fixed resolution of URIs v. CURIEs
 * Drop assertions with non-namespaced CURIEs as the predicate (per updated spec)
@@ -10,7 +10,8 @@ Change History
 * Corrected subject resolution behavior for <link> and <meta> elements
 * Implemented entry point and extractor interface for compatibility with the
   ccrdf.rdfextract library.
-       
+* Fixed parsing of ``rev`` assertions, which was formerly completely broken.
+
 0.2 (2006-11-21)
 ================
 
