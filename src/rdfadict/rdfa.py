@@ -55,7 +55,11 @@ class RdfaParser(object):
 ##                         'biblio':'http://example.org/biblio/0.1',
 ##                         'taxo':'http://purl.org/rss/1.0/modules/taxonomy/',
                         
-    def parsestring(self, in_string, base_uri, sink=DictTripleSink()):
+    def parsestring(self, in_string, base_uri, sink=None):
+
+        # see if a default sink is required
+        if sink is None:
+            sink = DictTripleSink()
 
         try:
             lxml_doc = lxml.etree.fromstring(in_string)
@@ -150,7 +154,7 @@ class RdfaParser(object):
 
         return "%s%s" % (ns, path)
     
-    def __parse(self, lxml_doc, base_uri='', sink=DictTripleSink()):
+    def __parse(self, lxml_doc, base_uri, sink):
 
         RDFA_ATTRS = ("about", "property", "rel", "rev", "href", "content")
         PRED_ATTRS = ("rel", "rev", "property")
@@ -191,7 +195,7 @@ class RdfaParser(object):
             obj = self.__resolve_subject(node, base_uri) or base_uri
             subject = self.__resolve_uri(node.attrib.get('href'), base_uri)
 
-            for p in note.attrib.get('rel').split():
+            for p in node.attrib.get('rev').split():
                 pred = self.__resolve_curie(p, node)
                 if pred is not None:
                     # the CURIE resolved
