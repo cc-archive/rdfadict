@@ -25,6 +25,10 @@ import lxml.etree
 
 from rdfadict.sink import DictTripleSink
 
+class SubjectResolutionError(AttributeError):
+    """Exception notifying caller that the subject can not be resolved for the
+    specified node."""
+
 class RdfaParser(object):
 
     HTML_RESERVED_WORDS = ('license',)
@@ -77,6 +81,11 @@ class RdfaParser(object):
         return self.parsestring(urllib.urlopen(url).read(), url, sink)
 
     def __resolve_subject(self, node, base_uri):
+        """Resolve the subject for a particular node, with respect to the 
+        base URI.  If the subject can not be resolved, return None.
+
+        XXX Note that this does not perform reification.  At all.
+        """
 
         # check for meta or link which don't traverse up the entire tree
         if node.tag in ('link', 'meta'):
@@ -94,7 +103,8 @@ class RdfaParser(object):
             else:
                 # XXX Does not handle head in XHTML2 docs; see 4.3.3.1 in spec
                 # no explicitly defined parent, perform reification
-                raise AttributeError("Unable to resolve subject for node.")
+                raise SubjectResolutionError(
+                    "Unable to resolve subject for node.")
             
         # traverse up tree looking for an about tag
         about_nodes = node.xpath('ancestor-or-self::*[@about]')
@@ -180,25 +190,47 @@ class RdfaParser(object):
         # using rel
         for node in lxml_doc.xpath('//*[@rel]'):
 
-            subject = self.__resolve_subject(node, base_uri) or base_uri
+            subj_err = None
+            try:
+                subject = self.__resolve_subject(node, base_uri) or base_uri
+            except SubjectResolutionError, e:
+                # unable to resolve the subject; if none of the predicates
+                # are namespaced, this doesn't matter... so save it for later
+                subj_err = e
+
             obj = self.__resolve_uri(node.attrib.get('href'), base_uri)
 
             for p in node.attrib.get('rel').split():
                 pred = self.__resolve_curie(p, node)
                 if pred is not None:
-                    # the CURIE resolved
+                    # the CURIE resolved -- 
+                    # make sure we were able to resolve the subject
+                    if subj_err is not None:
+                        raise subj_err
+
                     sink.triple( subject, pred, obj )
 
         # using rev
         for node in lxml_doc.xpath('//*[@rev]'):
 
-            obj = self.__resolve_subject(node, base_uri) or base_uri
+            obj_err = None
+            try:
+                obj = self.__resolve_subject(node, base_uri) or base_uri
+            except SubjectResolutionError, e:
+                # unable to resolve the object; if none of the predicates
+                # are namespaced, this doesn't matter... so save it for later
+                obj_err = e
+
             subject = self.__resolve_uri(node.attrib.get('href'), base_uri)
 
             for p in node.attrib.get('rev').split():
                 pred = self.__resolve_curie(p, node)
                 if pred is not None:
-                    # the CURIE resolved
+                    # the CURIE resolved -- 
+                    # make sure we were able to resolve the subject
+                    if obj_err is not None:
+                        raise obj_err
+
                     sink.triple( subject, pred, obj )
 
         return sink

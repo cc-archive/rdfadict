@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: rdfadict
-Version: 0.3
+Version: 0.3.1
 Summary: An RDFa parser wth a simple dictionary-like interface.
 Home-page: http://wiki.creativecommons.org/RdfaDict
 Author: Nathan R. Yergler
@@ -10,8 +10,8 @@ Description: ========
         rdfadict
         ========
         
-        :Date: $LastChangedDate: 2007-03-08 13:25:45 -0500 (Thu, 08 Mar 2007) $
-        :Version: $LastChangedRevision: 5518 $
+        :Date: $LastChangedDate: 2007-03-08 13:27:25 -0500 (Thu, 08 Mar 2007) $
+        :Version: $LastChangedRevision: 5519 $
         :Author: Nathan R. Yergler <nathan@creativecommons.org>
         :Organization: `Creative Commons <http://creativecommons.org>`_
         :Copyright:
@@ -165,6 +165,7 @@ Description: ========
         >>> rdfa_sample2 = """
         ... <div xmlns:dc="http://purl.org/dc/elements/1.1/"
         ...      xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        ... <link rel="alternate" href="/foo/bar" />
         ... <h1 property="dc:title">Vacation in the South of France</h1>
         ... <h2>created
         ... by <span property="dc:creator">Mark Birbeck</span>
@@ -205,6 +206,57 @@ Description: ========
         ...      triples['http://example.com/rdfadict/sample2'].keys() ]
         False
         
+        Similar to this case is the ``link`` tag in the example HTML.  Based on the
+        subject resolution rules for ``link`` and ``meta`` tags, no subject can be
+        resolved for this assertion.  However, this does not throw an exception because
+        the value of the ``rel`` attribute is not namespaced.
+        
+        Consider an alternative, contrived example:
+        
+        >>> link_sample = """
+        ... <div xmlns:dc="http://purl.org/dc/elements/1.1/"
+        ...      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        ...      about="http://example.com/">
+        ... <link rel="dc:creator" href="http://example.com/birbeck" />
+        ... </div>"""
+        
+        Based on the subject resolution rules for ``link`` tags, we expect to see
+        one assertion: that http://example.com/birbeck represents the creator of
+        http://example.com.  This can be tested; note we supply a different
+        ``base_uri`` to ensure the subject is being properly resolved.
+        
+        >>> parser = rdfadict.RdfaParser()
+        >>> link_base_uri = 'http://example.com/foo'
+        >>> triples = parser.parsestring(link_sample, link_base_uri)
+        
+        >>> triples.keys()
+        ['http://example.com/']
+        >>> len(triples['http://example.com/'])
+        1
+        >>> triples['http://example.com/']['http://purl.org/dc/elements/1.1/creator']
+        ['http://example.com/birbeck']
+        
+        Note that this HTML makes **no** assertions about the source document:
+        
+        >>> link_base_uri in triples.keys()
+        False
+        
+        If the HTML sample is modified slightly, and the ``about`` attribut is omitted,
+        rdfadict is unable to resolve the subject and raises an Exception.
+        
+        
+        >>> link_sample = """
+        ... <div xmlns:dc="http://purl.org/dc/elements/1.1/"
+        ...      xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
+        ... <link rel="dc:creator" href="http://example.com/birbeck" />
+        ... </div>"""
+        >>> parser = rdfadict.RdfaParser()
+        >>> link_base_uri = 'http://example.com/foo'
+        >>> triples = parser.parsestring(link_sample, link_base_uri)
+        Traceback (most recent call last):
+        ...
+        SubjectResolutionError: Unable to resolve subject for node.
+        
         See the `RDFa Primer <http://www.w3.org/2006/07/SWD/RDFa/primer/>`_
         for more RDFa examples.
         
@@ -213,7 +265,7 @@ Description: ========
         
         **rdfadict** uses a simple interface (the triple sink) to pass RDF triples
         extracted back to some storage mechanism.  A class which acts as a triple
-        sink only needs to define a single method, ``triple``.  For example:
+        sink only needs to define a single method, ``triple``.  For example::
         
         class StdOutTripleSink(object):
         """A triple sink which prints out the triples as they are received."""
@@ -257,6 +309,11 @@ Description: ========
         
         Change History
         **************
+        
+        0.3.1 (2007-03-09)
+        ==================
+        
+        * Fixed bug in subject resolution exception handling.
         
         0.3 (2007-03-08)
         ================
