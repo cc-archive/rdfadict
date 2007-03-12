@@ -163,6 +163,10 @@ class RdfaParser(object):
 
         # if we were unable to resolve the namespace, return None
         if ns is None:
+            # make sure this isn't "cc:license"
+            if curie_or_uri.lower().strip() == 'cc:license':
+                return self.__resolve_curie('license')
+
             return None
             
         if ns[-1] not in ("#", "/"):
