@@ -1,6 +1,12 @@
 Change History
 **************
 
+0.3.2 (2007-03-12)
+=================
+
+* Ignore assertions which have unresolvable namespace prefixes.
+* Special case handling for ``cc:license``.
+
 0.3.1 (2007-03-09)
 ==================
 
