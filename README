@@ -236,7 +236,6 @@ Note that this HTML makes **no** assertions about the source document:
 If the HTML sample is modified slightly, and the ``about`` attribut is omitted,
 rdfadict is unable to resolve the subject and raises an Exception.
 
-
   >>> link_sample = """
   ... <div xmlns:dc="http://purl.org/dc/elements/1.1/"
   ...      xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
@@ -249,8 +248,38 @@ rdfadict is unable to resolve the subject and raises an Exception.
      ...
   SubjectResolutionError: Unable to resolve subject for node.
 
+If a namespace is unable to be resolved, the assertion is ignored.
+
+  >>> ns_sample = """
+  ... <a href="http://example.com/foo" rel="foo:bar">Content</a>
+  ... """
+  >>> parser = rdfadict.RdfaParser()
+  >>> triples = parser.parsestring(ns_sample, 'http://example.com/bob')
+  >>> triples
+  {}
+
+The one example to this rule concerns statements such as this:
+
+  >>> cc_legacy_sample = """
+  ... <a href="http://creativecommons.org/licenses/by/2.5/" rel="cc:license">
+  ... License</a>. 
+  ... """
+
+Due to a large amount of legacy HTML, ``cc:license`` is special cased as 
+equivalent to ``license`` (and therefore an HTML reserved word).
+
+  >>> parser = rdfadict.RdfaParser()
+  >>> triples = parser.parsestring(cc_legacy_sample, 'http://example.com/')
+  >>> triples.keys()
+  ['http://example.com/']
+  >>> triples['http://example.com/'].keys()
+  ['http://www.w3.org/1999/xhtml#license']
+  >>> triples['http://example.com/']['http://www.w3.org/1999/xhtml#license']
+  ['http://creativecommons.org/licenses/by/2.5/']
+
 See the `RDFa Primer <http://www.w3.org/2006/07/SWD/RDFa/primer/>`_
 for more RDFa examples.
+
 
 Triple Sinks
 ============
