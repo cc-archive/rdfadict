@@ -75,7 +75,7 @@ class RdfaParser(object):
 
         return self.__parse(lxml_doc, base_uri, sink)
 
-    def parseurl(self, url, sink=DictTripleSink()):
+    def parseurl(self, url, sink=None):
         """Retrieve a URL and parse RDFa contained within it."""
 
         return self.parsestring(urllib.urlopen(url).read(), url, sink)
@@ -153,11 +153,17 @@ class RdfaParser(object):
         if ns == '':
             ns = None
 
+        # use the namespace map of the local context if available
         if context is not None:
-            ns = context.nsmap[ns]
+            ns = context.nsmap.get(ns, None)
 
         else:
-            ns = self.__nsmap[ns]
+            # use the document namespace map
+            ns = self.__nsmap.get(ns, None)
+
+        # if we were unable to resolve the namespace, return None
+        if ns is None:
+            return None
             
         if ns[-1] not in ("#", "/"):
             ns = "%s#" % ns
