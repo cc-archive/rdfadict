@@ -1,8 +1,14 @@
 Change History
 **************
 
+0.3.3 (2007-03-14)
+==================
+
+* Removed special case for ``cc:license``; instead, ``cc`` namespace simply 
+  has a default value of ``http://web.resource.org/cc/``.
+
 0.3.2 (2007-03-12)
-=================
+==================
 
 * Ignore assertions which have unresolvable namespace prefixes.
 * Special case handling for ``cc:license``.
