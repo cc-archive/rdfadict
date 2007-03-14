@@ -42,7 +42,9 @@ class RdfaParser(object):
         """Reset the parser, forgetting about b-nodes, etc."""
 
         self.__bnodes = {}
-        self.__nsmap = {}
+
+        # we default the cc: namespace to Creative Commons
+        self.__nsmap = {'cc':'http://web.resource.org/cc/'}
         
 ##        self.__nsmap = {None:'http://www.w3.org/1999/xhtml',
 ##                        }
@@ -155,7 +157,7 @@ class RdfaParser(object):
 
         # use the namespace map of the local context if available
         if context is not None:
-            ns = context.nsmap.get(ns, None)
+            ns = context.nsmap.get(ns, self.__nsmap.get(ns, None))
 
         else:
             # use the document namespace map
