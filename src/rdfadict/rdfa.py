@@ -23,6 +23,7 @@ import urlparse
 
 import lxml.etree
 
+import rdfadict.tidy
 from rdfadict.sink import DictTripleSink
 
 class SubjectResolutionError(AttributeError):
@@ -71,9 +72,13 @@ class RdfaParser(object):
             lxml_doc = lxml.etree.fromstring(in_string)
         except lxml.etree.XMLSyntaxError, e:
 
-            # try to parse as HTML
-            lxml_doc = lxml.etree.fromstring(in_string,
-                                             lxml.etree.HTMLParser())
+            try:
+                # try to Tidy the HTML
+                lxml_doc = rdfadict.tidy.tidystring(in_string).getroot()
+            except:
+                # try to parse as HTML
+                lxml_doc = lxml.etree.fromstring(in_string,
+                                                 lxml.etree.HTMLParser())
 
         return self.__parse(lxml_doc, base_uri, sink)
 
