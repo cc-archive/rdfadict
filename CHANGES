@@ -1,6 +1,12 @@
 Change History
 **************
 
+0.4.0 (2007-03-20)
+==================
+
+* Provide rudimentary fallback to Tidy when we encounter HTML which is not
+  well-formed XML.
+
 0.3.3 (2007-03-14)
 ==================
 
