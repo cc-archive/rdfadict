@@ -29,7 +29,7 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.3.3",
+    version = "0.4.0",
     packages = ['rdfadict'],
     package_dir = {'':'src'},
 
@@ -39,8 +39,9 @@ setup(
     install_requires = ['setuptools',
                         'lxml',
                         ],
-    extras_require = {'ccrdf':'ccrdf>=0.6a3'},
-    
+    extras_require = {'ccrdf':'ccrdf>=0.6a3',
+                      'tidy':[]},
+
     include_package_data = True,
     zip_safe = True,
 
