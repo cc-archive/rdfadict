@@ -1,6 +1,12 @@
 Change History
 **************
 
+0.4.1 (2007-03-21)
+==================
+
+* Use `uTidylib <http://utidylib.berlios.de>`_ instead of ``os.system`` for
+  wrapping tidy.
+
 0.4.0 (2007-03-20)
 ==================
 

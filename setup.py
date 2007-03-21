@@ -29,7 +29,7 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.4.0",
+    version = "0.4.1",
     packages = ['rdfadict'],
     package_dir = {'':'src'},
 
@@ -40,7 +40,8 @@ setup(
                         'lxml',
                         ],
     extras_require = {'ccrdf':'ccrdf>=0.6a3',
-                      'tidy':[]},
+                      'tidy':['ctypes','utidylib']},
+    dependency_links=['https://cctools.svn.sourceforge.net/svnroot/cctools/vendorlibs/utidylib/#egg=utidylib-0.2-cvs',],
 
     include_package_data = True,
     zip_safe = True,

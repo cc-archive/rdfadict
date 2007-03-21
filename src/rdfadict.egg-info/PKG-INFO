@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: rdfadict
-Version: 0.3.3
+Version: 0.4.1
 Summary: An RDFa parser wth a simple dictionary-like interface.
 Home-page: http://wiki.creativecommons.org/RdfaDict
 Author: Nathan R. Yergler
@@ -10,8 +10,8 @@ Description: ========
         rdfadict
         ========
         
-        :Date: $LastChangedDate: 2007-03-14 17:20:39 -0400 (Wed, 14 Mar 2007) $
-        :Version: $LastChangedRevision: 5572 $
+        :Date: $LastChangedDate: 2007-03-20 11:30:21 -0400 (Tue, 20 Mar 2007) $
+        :Version: $LastChangedRevision: 5612 $
         :Author: Nathan R. Yergler <nathan@creativecommons.org>
         :Organization: `Creative Commons <http://creativecommons.org>`_
         :Copyright:
@@ -34,7 +34,27 @@ Description: ========
         $ python setup.py install
         
         If installing using setup.py, `lxml <http://codespeak.net/lxml>`_
-        will also need to be installed.
+        will also need to be installed.  ``easy_install`` will manage this for you.
+        
+        Extras
+        ======
+        
+        rdfadict provides two optional *extras* available when installing via
+        ``easy_install`` (or other ``setuptools`` based tool such as zc.buildout):
+        
+        * ``ccrdf`` registers an entry point providing a graph extractor for
+        `ccRdf <http://python.org/pypi/ccrdf>`_.
+        * ``tidy`` provides fallback to Tidy when attempting to parse HTML which is
+        not well-formed XML.  Note that this requires ``tidy`` to be on your
+        system path.
+        
+        Extras can be specified in square brackets; for example::
+        
+        $ easy_install rdfadict[ccrdf]
+        
+        or::
+        
+        $ easy_install rdfadict[ccrdf,tidy]
         
         Usage
         *****
@@ -352,6 +372,18 @@ Description: ========
         
         Change History
         **************
+        
+        0.4.1 (2007-03-21)
+        ==================
+        
+        * Use `uTidylib <http://utidylib.berlios.de>`_ instead of ``os.system`` for
+        wrapping tidy.
+        
+        0.4.0 (2007-03-20)
+        ==================
+        
+        * Provide rudimentary fallback to Tidy when we encounter HTML which is not
+        well-formed XML.
         
         0.3.3 (2007-03-14)
         ==================
