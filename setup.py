@@ -41,7 +41,7 @@ setup(
                         ],
     extras_require = {'ccrdf':'ccrdf>=0.6a3',
                       'tidy':['ctypes','utidylib']},
-    dependency_links=['https://cctools.svn.sourceforge.net/svnroot/cctools/vendorlibs/utidylib/#egg=utidylib-0.2-cvs',],
+    dependency_links=['http://cctools.svn.sourceforge.net/svnroot/cctools/vendorlibs/utidylib/#egg=utidylib-0.2-cvs',],
 
     include_package_data = True,
     zip_safe = True,
