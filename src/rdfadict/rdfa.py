@@ -43,12 +43,12 @@ class RdfaParser(object):
     def __init__(self):
 
         self.reset()
-        self.__REIFY_COUNTER = 0
         
     def reset(self):
         """Reset the parser, forgetting about b-nodes, etc."""
 
-        self.__bnodes = {}
+        self.__B_NODES = {}
+        self.__BASE_URI = None
 
         # we default the cc: namespace to Creative Commons
         self.__nsmap = {'cc':'http://creativecommons.org/ns#'}
@@ -87,15 +87,18 @@ class RdfaParser(object):
         if lxml_doc.xpath('//head/base'):
             base_uri = lxml_doc.xpath('//head/base')[-1].attrib['href']
 
+        # set the base uri for the parser
+        self.__BASE_URI = base_uri
+
         # call the primary parser
-        return self.__parse(lxml_doc, base_uri, sink)
+        return self.__parse(lxml_doc, sink)
 
     def parseurl(self, url, sink=None):
         """Retrieve a URL and parse RDFa contained within it."""
 
         return self.parsestring(urllib.urlopen(url).read(), url, sink)
 
-    def __resolve_subject(self, node, base_uri):
+    def __resolve_subject(self, node):
         """Resolve the subject for a particular node, with respect to the 
         base URI.  If the subject can not be resolved, return None.
 
@@ -114,7 +117,7 @@ class RdfaParser(object):
 
             if explicit_parent:
                 return self.__resolve_safeCurie(
-                    explicit_parent.attrib['about'], base_uri)
+                    explicit_parent.attrib['about'], node)
             else:
                 # XXX Does not handle head in XHTML2 docs; see 4.3.3.1 in spec
                 # no explicitly defined parent, perform reification
@@ -125,17 +128,19 @@ class RdfaParser(object):
         about_nodes = node.xpath('ancestor-or-self::*[@about]')
         if about_nodes:
             return self.__resolve_safeCurie(about_nodes[-1].attrib['about'],
-                                            base_uri, about_nodes[-1])
+                                            about_nodes[-1])
         else:
             return None
 
-    def __resolve_uri(self, uri, base_uri):
+    def __resolve_uri(self, uri):
         """Resolve a (possibly) relative URI to an absolute URI.  Handle
-        special cases of HTML reserved words, such as "license"."""
+        special cases of HTML reserved words, such as "license".
 
-        return urlparse.urljoin(base_uri, uri)
+        Returns and RDF.Uri."""
 
-    def __resolve_safeCurie(self, safe_curie, base_uri, context):
+        return RDF.Uri(urlparse.urljoin(self.__BASE_URI, uri))
+
+    def __resolve_safeCurie(self, safe_curie, context):
 
         if not safe_curie: return None
 
@@ -143,7 +148,12 @@ class RdfaParser(object):
             return self.__resolve_curie(safe_curie[1:-1], context)
         else:
             # XXX
-            return self.__resolve_uri(safe_curie, base_uri)
+            return self.__resolve_uri(safe_curie)
+
+    def __bnode(self, name):
+        """Return a Blank Node."""
+
+        return RDF.Node(blank = "%s#%s" % (self.__BASE_URI, name))
 
     def __resolve_curie(self, curie, context=None):
 
@@ -151,6 +161,11 @@ class RdfaParser(object):
         ns, path = curie.split(':', 1)
         if ns == '':
             ns = None
+
+        # see if this is a blank node
+        if ns == '_':
+            # blank node; return an appropriate RDF.Node
+            return self.__bnode(path)
 
         # use the namespace map of the local context if available
         if context is not None:
@@ -171,7 +186,7 @@ class RdfaParser(object):
         if ns[-1] not in ("#", "/"):
             ns = "%s#" % ns
 
-        return "%s%s" % (ns, path)
+        return RDF.Uri("%s%s" % (ns, path))
 
     def __resolve_relrev(self, curie_or_uri, context=None):
         """Convert a compact URI (i.e., "cc:license") to a fully-qualified
@@ -221,14 +236,17 @@ class RdfaParser(object):
             lang = ''
         
         # look for datatype
-        datatype = node.attrib.get('datatype', '')
+        datatype = node.attrib.get('datatype', None)
         if datatype:
-            datatype = self.__resolve_curie(datatype, node)
+            datatype = RDF.Uri(self.__resolve_curie(datatype, node))
 
-        return RDF.Node(literal=content, language=lang, 
-                        datatype=RDF.Uri(datatype))
+            return RDF.Node(literal=content, language=lang, 
+                            datatype=datatype)
+        else:
+            # no datatype
+            return RDF.Node(literal=content, language=lang)
 
-    def __parse(self, lxml_doc, base_uri, sink):
+    def __parse(self, lxml_doc, sink):
 
         RDFA_ATTRS = ("about", "property", "rel", "rev", "href", "content")
         PRED_ATTRS = ("rel", "rev", "property")
@@ -242,14 +260,15 @@ class RdfaParser(object):
         # using the property
         for node in lxml_doc.xpath('//*[@property]'):
 
-            subject = self.__resolve_subject(node, base_uri) or base_uri
+            subject = self.__resolve_subject(node) or \
+                RDF.Uri(self.__BASE_URI)
             obj = self.__get_content(node)
 
             for p in node.attrib.get('property').split():
                 pred = self.__resolve_relrev(p, node)
                 if pred is not None:
                     # the CURIE resolved
-                    sink.triple( RDF.Uri(subject), RDF.Uri(pred), obj )
+                    sink.triple( subject, pred, obj )
                 else:
                     print obj
 
@@ -258,7 +277,8 @@ class RdfaParser(object):
 
             subj_err = None
             try:
-                subject = self.__resolve_subject(node, base_uri) or base_uri
+                subject = self.__resolve_subject(node) or \
+                    RDF.Uri(self.__BASE_URI)
             except SubjectResolutionError, e:
                 # unable to resolve the subject; if none of the predicates
                 # are namespaced, this doesn't matter... so save it for later
@@ -268,10 +288,9 @@ class RdfaParser(object):
             obj = None
             if 'resource' in node.attrib:
                 obj = self.__resolve_safeCurie(node.attrib.get('resource'),
-                                               base_uri, node)
+                                               node)
             elif 'href' in node.attrib:
-                obj = self.__resolve_uri(node.attrib.get('href'),
-                                         base_uri)
+                obj = self.__resolve_uri(node.attrib.get('href'))
             else:
                 # neither resource or href; nothing to do here
                 continue
@@ -284,14 +303,15 @@ class RdfaParser(object):
                     if subj_err is not None:
                         raise subj_err
 
-                    sink.triple( RDF.Uri(subject), RDF.Uri(pred), RDF.Uri(obj) )
+                    sink.triple( subject, pred, obj )
 
         # using rev
         for node in lxml_doc.xpath('//*[@rev]'):
 
             obj_err = None
             try:
-                obj = self.__resolve_subject(node, base_uri) or base_uri
+                obj = self.__resolve_subject(node) or \
+                    RDF.Uri(self.__BASE_URI)
             except SubjectResolutionError, e:
                 # unable to resolve the object; if none of the predicates
                 # are namespaced, this doesn't matter... so save it for later
@@ -301,10 +321,9 @@ class RdfaParser(object):
             subject = None
             if 'resource' in node.attrib:
                 subject = self.__resolve_safeCurie(node.attrib.get('resource'),
-                                               base_uri, node)
+                                                   node)
             elif 'href' in node.attrib:
-                subject = self.__resolve_uri(node.attrib.get('href'),
-                                         base_uri)
+                subject = self.__resolve_uri(node.attrib.get('href'))
             else:
                 # neither resource or href; nothing to do here
                 continue
@@ -317,6 +336,6 @@ class RdfaParser(object):
                     if obj_err is not None:
                         raise obj_err
 
-                    sink.triple( RDF.Uri(subject), RDF.Uri(pred), RDF.Uri(obj) )
+                    sink.triple( subject, pred, obj )
 
         return sink
