@@ -113,24 +113,26 @@ class RdfaParser(object):
             elif node.getparent().attrib.get('about', False):
                 explicit_parent = node.getparent()
             else:
-                explicit_parent = False
+                explicit_parent = None
 
-            if explicit_parent:
+            if explicit_parent is not None:
                 return self.__resolve_safeCurie(
                     explicit_parent.attrib['about'], node)
             else:
-                # XXX Does not handle head in XHTML2 docs; see 4.3.3.1 in spec
-                # no explicitly defined parent, perform reification
-                raise SubjectResolutionError(
-                    "Unable to resolve subject for node.")
+                return None
             
         # traverse up tree looking for an about tag
-        about_nodes = node.xpath('ancestor-or-self::*[@about]')
-        if about_nodes:
-            return self.__resolve_safeCurie(about_nodes[-1].attrib['about'],
-                                            about_nodes[-1])
-        else:
-            return None
+        about_nodes = node.xpath('ancestor-or-self::*[@about or @resource]')
+        for a_node in about_nodes[::-1]:
+            if a_node == node and 'about' not in a_node.attrib:
+                # only look @ about
+                continue
+
+            value = a_node.attrib.get('about', a_node.attrib.get('resource'))
+            return self.__resolve_safeCurie(value, a_node)
+        
+        # if we get this far, we can't figure shit out
+        return None
 
     def __resolve_uri(self, uri):
         """Resolve a (possibly) relative URI to an absolute URI.  Handle
@@ -220,12 +222,22 @@ class RdfaParser(object):
         else:
             return self.__resolve_curie(curie_or_uri, context)
 
+    def __get_node_contents(self, node, strip=False):
+        
+        if strip:
+            return ""
+        else:
+            text = node.text or ""
+            tail = node.tail or ""
+            return text + "".join(
+                [lxml.etree.tostring(e) for e in node]) 
+
     def __get_content(self, node):
         """Return the content of the node; content is returned as an
         RDF.Node with appropriate language and datatype settings."""
 
         # determine the actual value
-        content = node.attrib.get('content', node.text)
+        content = node.attrib.get('content', self.__get_node_contents(node))
 
         # look for language
         lang_nodes = node.xpath('ancestor-or-self::*[@xml:lang]')
@@ -240,6 +252,11 @@ class RdfaParser(object):
         if datatype:
             datatype = RDF.Uri(self.__resolve_curie(datatype, node))
 
+            # check for xsd:string
+            if str(datatype) == 'http://www.w3.org/2001/XMLSchema#string':
+                # fix up the literal content
+                pass
+                
             return RDF.Node(literal=content, language=lang, 
                             datatype=datatype)
         else:
