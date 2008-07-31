@@ -29,20 +29,25 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.4.1",
+    version = "0.5",
     packages = ['rdfadict'],
     package_dir = {'':'src'},
 
-    entry_points = {'ccrdf.extract_to_graph':'rdfa = rdfadict:extract [ccrdf]',
-                    'console_scripts' : ['test = rdfadict.test:test']},
+    entry_points = {
+        'ccrdf.extract_to_graph': [
+            'rdfa = rdfadict:extract [ccrdf]',
+            ],
+        
+        'console_scripts' : [
+            'tf_test = rdfadict.tests.test_taskforce:cli',
+            ]
+        },
     
     install_requires = ['setuptools',
-                        'lxml',
+                        #'librdf',
+                        'lxml>=2.0',
+                        'ccrdf',
                         ],
-    extras_require = {'ccrdf':'ccrdf>=0.6a3',
-                      'tidy':['ctypes','utidylib']},
-    dependency_links=['http://cctools.svn.sourceforge.net/svnroot/cctools/vendorlibs/utidylib/#egg=utidylib-0.2-cvs',],
-
     include_package_data = True,
     zip_safe = True,
 
