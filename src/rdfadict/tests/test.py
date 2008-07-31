@@ -24,7 +24,12 @@ import os
 import sys
 import doctest
 
-def test():
+def test_suite():
+    """Return a test suite for our doctests."""
+    
+    return doctest.DocFileSuite('README.txt', 
+                                module_relative=True,
+                                package='rdfadict')
 
     # run the doctests in README
     try:
@@ -34,4 +39,4 @@ def test():
         doctest.testfile('../../README')
     
 if __name__ == '__main__':
-    test()
+    test_suite.run()
