@@ -1,32 +1,3 @@
-========
-rdfadict
-========
-
-:Date: $LastChangedDate$
-:Version: $LastChangedRevision$
-:Author: Nathan R. Yergler <nathan@creativecommons.org>
-:Organization: `Creative Commons <http://creativecommons.org>`_
-:Copyright: 
-   2006, Nathan R. Yergler, Creative Commons; 
-   licensed to the public under the `MIT license 
-   <http://opensource.org/licenses/mit-license.php>`_.
-
-.. contents::
-
-Installation
-************
-
-rdfadict and its dependencies may be installed using `easy_install 
-<http://peak.telecommunity.com/DevCenter/EasyInstall>`_ (recommended) ::
-
-  $ easy_install rdfadict
-
-or by using the standard distutils setup.py::
-
-  $ python setup.py install
-
-If installing using setup.py, `lxml <http://codespeak.net/lxml>`_ 
-will also need to be installed.  ``easy_install`` will manage this for you.
 
 Usage
 *****
@@ -283,9 +254,9 @@ Due to a large amount of legacy HTML, the ``cc`` namespace defaults to
   >>> keys = triples['http://example.com/'].keys()
   >>> keys.sort()
   >>> keys
-  ['http://example.com/foo/foo', 'http://web.resource.org/cc/license']
+  ['http://creativecommons.org/ns#license', 'http://example.com/foo/foo']
 
-  >>> triples['http://example.com/']['http://web.resource.org/cc/license']
+  >>> triples['http://example.com/']['http://creativecommons.org/ns#license']
   ['http://creativecommons.org/licenses/by/2.5/']
 
   >>> triples['http://example.com/']['http://example.com/foo/foo']

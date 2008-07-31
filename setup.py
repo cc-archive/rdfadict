@@ -57,6 +57,8 @@ setup(
     long_description=(
          read('README')
          + '\n' +
+         read('src', 'rdfadict', 'README.txt')
+         + '\n' + 
          read('CHANGES')
          + '\n' +
          'Download\n'
