@@ -1,6 +1,0 @@
-[console_scripts]
-test = rdfadict.test:test
-
-[ccrdf.extract_to_graph]
-rdfa = rdfadict:extract [ccrdf]
-
