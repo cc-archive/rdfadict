@@ -209,15 +209,24 @@ class RdfaParser(object):
         """Return the content of the node; content is returned as an
         RDF.Node with appropriate language and datatype settings."""
 
+        # determine the actual value
         content = node.attrib.get('content', node.text)
+
+        # look for language
         lang_nodes = node.xpath('ancestor-or-self::*[@xml:lang]')
         if lang_nodes:
             lang = lang_nodes[-1].attrib[
                 '{http://www.w3.org/XML/1998/namespace}lang']
         else:
             lang = ''
+        
+        # look for datatype
+        datatype = node.attrib.get('datatype', '')
+        if datatype:
+            datatype = self.__resolve_curie(datatype, node)
 
-        return RDF.Node(literal=content, language=lang)
+        return RDF.Node(literal=content, language=lang, 
+                        datatype=RDF.Uri(datatype))
 
     def __parse(self, lxml_doc, base_uri, sink):
 
