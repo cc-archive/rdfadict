@@ -210,8 +210,12 @@ class RdfaParser(object):
         RDF.Node with appropriate language and datatype settings."""
 
         content = node.attrib.get('content', node.text)
-        lang = node.attrib.get('{http://www.w3.org/XML/1998/namespace}lang', 
-                               '')
+        lang_nodes = node.xpath('ancestor-or-self::*[@xml:lang]')
+        if lang_nodes:
+            lang = lang_nodes[-1].attrib[
+                '{http://www.w3.org/XML/1998/namespace}lang']
+        else:
+            lang = ''
 
         return RDF.Node(literal=content, language=lang)
 
