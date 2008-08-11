@@ -23,6 +23,7 @@
 import os
 import sys
 import doctest
+import unittest
 
 def test_suite():
     """Return a test suite for our doctests."""
@@ -39,4 +40,6 @@ def test_suite():
         doctest.testfile('../../README')
     
 if __name__ == '__main__':
-    test_suite.run()
+    unittest.main()
+
+    # test_suite().run()

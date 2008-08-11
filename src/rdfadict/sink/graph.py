@@ -20,19 +20,34 @@
 
 """Triple sink based on ccrdf's RDF Store."""
 
-import ccrdf.rdfdict
+#import ccrdf.rdfdict
+import RDF
 
 class GraphSink(object):
-    """A triple sink which adds new triples to an existing graph."""
+    """A triple sink which adds new triples to an existing librdf graph."""
 
     def __init__(self, graph):
         self.graph = graph
 
     def triple(self, s, p, o):
 
+        # XXX dereference the URIs, literals to plain strings
         self.graph.add( (s,p,o) )
 
-        
+class RedlandModelSink(object):
+    """A sink which wraps a Redland Model."""
+
+    def __init__(self, model):
+        self.model = model
+
+    def triple(self, s, p, o):
+
+        print s, p, o
+
+        self.model.append(RDF.Statement(s, p, o))
+
+
+"""
 class RdfStoreSink(ccrdf.rdfdict.rdfStore):
 
     def __init__(self):
@@ -42,3 +57,4 @@ class RdfStoreSink(ccrdf.rdfdict.rdfStore):
 
         self.store.add( (s,p,o) )
 
+"""

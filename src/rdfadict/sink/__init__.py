@@ -18,19 +18,19 @@
 ## FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ## DEALINGS IN THE SOFTWARE.
 
-"""Simply triple Sink objects."""
+"""Simple triple Sink objects."""
 
 class SimpleTripleSink(list):
     """A bare-bones Triple sink that just stores them as a list of tuples."""
 
     def triple(self, s, p, o):
 
-        self.append( (s,p,o) )
+        self.append( (str(s),str(p),str(o)) )
 
 class DictTripleSink(dict):
 
     def triple(self, s, p, o):
         """Add a triple [s, p, o] to the triple dictionary."""
 
-        self.setdefault(s, {}).setdefault(p, [])
-        self[s][p].append(o)
+        self.setdefault(str(s), {}).setdefault(str(p), [])
+        self[str(s)][str(p)].append(str(o))

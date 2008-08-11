@@ -61,6 +61,8 @@ class TaskForceTest(unittest.TestCase):
         import rdfadict
         import rdfadict.sink.graph
 
+        print self._uri
+
         # set up our target sink
         g = RDF.Model()
         sink = rdfadict.sink.graph.RedlandModelSink(g)
@@ -78,6 +80,8 @@ def test_suite():
 
     test_suite = unittest.TestSuite()
     parser = RDF.Parser()
+
+    return test_suite
 
     for manifest in MANIFESTS:
 

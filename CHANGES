@@ -1,6 +1,20 @@
 Change History
 **************
 
+0.5 (unreleased)
+================
+
+* Wired RDFa test suite into our test harness so we test against the
+  full specification.
+* Removed tidy extra; parsing is now handled by lxml.html, removing
+  the need for cleaning.
+* Doctests are now in README.txt in the rdfadict package.
+
+0.4.2 (2007-06-05)
+==================
+
+* Corrected dependency link for uTidylib.
+
 0.4.1 (2007-03-21)
 ==================
 
