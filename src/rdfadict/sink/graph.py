@@ -1,4 +1,4 @@
-## Copyright (c) 2006-2007 Nathan R. Yergler, Creative Commons
+## Copyright (c) 2006-2008 Nathan R. Yergler, Creative Commons
 
 ## Permission is hereby granted, free of charge, to any person obtaining
 ## a copy of this software and associated documentation files (the "Software"),
@@ -18,21 +18,33 @@
 ## FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ## DEALINGS IN THE SOFTWARE.
 
-"""Triple sink based on ccrdf's RDF Store."""
-
-import ccrdf.rdfdict
+"""Triple sinks which support adding to RDF graphs."""
 
 class GraphSink(object):
-    """A triple sink which adds new triples to an existing graph."""
+    """A triple sink which adds new triples to an existing rdflib graph."""
 
     def __init__(self, graph):
         self.graph = graph
 
     def triple(self, s, p, o):
 
+        # XXX dereference the URIs, literals to plain strings
         self.graph.add( (s,p,o) )
 
-        
+class RedlandModelSink(object):
+    """A sink which wraps a Redland Model."""
+
+    def __init__(self, model):
+        self.model = model
+
+    def triple(self, s, p, o):
+
+        import RDF
+
+        self.model.append(RDF.Statement(s, p, o))
+
+
+"""
 class RdfStoreSink(ccrdf.rdfdict.rdfStore):
 
     def __init__(self):
@@ -42,3 +54,4 @@ class RdfStoreSink(ccrdf.rdfdict.rdfStore):
 
         self.store.add( (s,p,o) )
 
+"""
