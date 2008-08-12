@@ -1,4 +1,4 @@
-## Copyright (c) 2006 Nathan R. Yergler, Creative Commons
+## Copyright (c) 2006-2008 Nathan R. Yergler, Creative Commons
 
 ## Permission is hereby granted, free of charge, to any person obtaining
 ## a copy of this software and associated documentation files (the "Software"),
@@ -23,6 +23,7 @@
 import os
 import sys
 import doctest
+import unittest
 
 def test_suite():
     """Return a test suite for our doctests."""
@@ -30,13 +31,3 @@ def test_suite():
     return doctest.DocFileSuite('README.txt', 
                                 module_relative=True,
                                 package='rdfadict')
-
-    # run the doctests in README
-    try:
-        doctest.testfile('README')
-    except IOError:
-        # maybe we're in a check out and README isn't in the cwd
-        doctest.testfile('../../README')
-    
-if __name__ == '__main__':
-    test_suite.run()
