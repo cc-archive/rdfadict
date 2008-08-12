@@ -1,6 +1,26 @@
 Change History
 **************
 
+0.5 (2008-08-12)
+================
+
+* rdfadict now acts as a wrapper for `pyRdfa
+  <http://www.w3.org/2007/08/pyRdfa/>`_ for full compliance with the
+  candidate recommendation.
+* The ``cc`` namespace is no longer special cased with a default
+  value.
+* Removed tidy extra and uTidylib dependency; parsing is now handled
+  by pyRdfa which uses html5lib for handling more broken HTML.
+* Doctests are now in README.txt in the rdfadict package.
+* The default XHTML namespace is now
+  http://www.w3.org/1999/xhtml/vocab instead of
+  http://www.w3.org/1999/xhtml
+
+0.4.2 (2007-06-05)
+==================
+
+* Corrected dependency link for uTidylib.
+
 0.4.1 (2007-03-21)
 ==================
 
