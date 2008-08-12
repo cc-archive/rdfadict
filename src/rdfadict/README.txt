@@ -155,9 +155,9 @@ photo:
   1
 
   >>> triples["http://example.com/myphoto.jpg"].keys()
-  ['http://www.w3.org/1999/xhtml#license']
+  ['http://www.w3.org/1999/xhtml/vocab#license']
   >>> triples["http://example.com/myphoto.jpg"] \
-  ...    ['http://www.w3.org/1999/xhtml#license']
+  ...    ['http://www.w3.org/1999/xhtml/vocab#license']
   ['http://creativecommons.org/licenses/by/3.0/']
 
 There are two things to note with respect to this example.  First, the relative
@@ -204,8 +204,8 @@ Note that this HTML makes **no** assertions about the source document:
   >>> link_base_uri in triples.keys()
   False
 
-If the HTML sample is modified slightly, and the ``about`` attribut is omitted,
-rdfadict is unable to resolve the subject and raises an Exception.
+If the HTML sample is modified slightly, and the ``about`` attribute
+is omitted, rdfadict is resolves the subject to the explicit base URI.
 
   >>> link_sample = """
   ... <div xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -215,9 +215,8 @@ rdfadict is unable to resolve the subject and raises an Exception.
   >>> parser = rdfadict.RdfaParser()
   >>> link_base_uri = 'http://example.com/foo'
   >>> triples = parser.parsestring(link_sample, link_base_uri)
-  Traceback (most recent call last):
-     ...
-  SubjectResolutionError: Unable to resolve subject for node.
+  >>> link_base_uri in triples.keys()
+  True
 
 If a namespace is unable to be resolved, the assertion is ignored.
 
@@ -228,39 +227,6 @@ If a namespace is unable to be resolved, the assertion is ignored.
   >>> triples = parser.parsestring(ns_sample, 'http://example.com/bob')
   >>> triples
   {}
-
-The one exception to this rule concerns statements such as this:
-
-  >>> cc_legacy_sample = """
-  ... <div>
-  ... <a href="http://creativecommons.org/licenses/by/2.5/" rel="cc:license">
-  ... License</a>. 
-  ...
-  ... <a href="http://creativecommons.org/licenses/by/2.5/" 
-  ... xmlns:cc="http://example.com/foo/" rel="cc:foo">
-  ... Overridden cc namespace</a>.
-  ...
-  ... </div>
-  ... """
-
-Due to a large amount of legacy HTML, the ``cc`` namespace defaults to 
-``http://web.resource.org/cc/``.  This **can** be overriden.
-
-  >>> parser = rdfadict.RdfaParser()
-  >>> triples = parser.parsestring(cc_legacy_sample, 'http://example.com/')
-  >>> triples.keys()
-  ['http://example.com/']
-
-  >>> keys = triples['http://example.com/'].keys()
-  >>> keys.sort()
-  >>> keys
-  ['http://creativecommons.org/ns#license', 'http://example.com/foo/foo']
-
-  >>> triples['http://example.com/']['http://creativecommons.org/ns#license']
-  ['http://creativecommons.org/licenses/by/2.5/']
-
-  >>> triples['http://example.com/']['http://example.com/foo/foo']
-  ['http://creativecommons.org/licenses/by/2.5/']
 
 See the `RDFa Primer <http://www.w3.org/2006/07/SWD/RDFa/primer/>`_
 for more RDFa examples.
@@ -289,8 +255,10 @@ example:
 
    >>> parser = rdfadict.RdfaParser()
    >>> list_sink = rdfadict.sink.SimpleTripleSink()
-   >>> parser.parsestring(rdfa_sample, base_uri, sink=list_sink)
-   [('http://example.com/rdfadict/', 'http://purl.org/dc/elements/1.1/title', 'Vacation in the South of France'), ('http://example.com/rdfadict/', 'http://purl.org/dc/elements/1.1/creator', 'Mark Birbeck'), ('http://example.com/rdfadict/', 'http://purl.org/dc/elements/1.1/date', '2006-01-02')]
+   >>> result = parser.parsestring(rdfa_sample, base_uri, sink=list_sink)
+
+   >>> result is list_sink
+   True
 
    >>> len(list_sink)
    3
