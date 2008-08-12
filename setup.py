@@ -1,4 +1,4 @@
-## Copyright (c) 2006-2007 Nathan R. Yergler, Creative Commons
+## Copyright (c) 2006-2008 Nathan R. Yergler, Creative Commons
 
 ## Permission is hereby granted, free of charge, to any person obtaining
 ## a copy of this software and associated documentation files (the "Software"),
@@ -44,10 +44,15 @@ setup(
         },
     
     install_requires = ['setuptools',
-                        #'librdf',
+                        'rdflib==2.4.0',
+                        'html5lib',
+                        'pyRdfa',
                         'lxml>=2.0',
                         'ccrdf',
                         ],
+    dependency_links = [
+        'http://dev.w3.org/2004/PythonLib-IH/dist/pyRdfa-2.0.tar.gz',],
+
     include_package_data = True,
     zip_safe = True,
 
