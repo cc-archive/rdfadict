@@ -1,7 +1,7 @@
 Change History
 **************
 
-0.5.1 (unreleased)
+0.5.1 (2008-08-13)
 ==================
 
 * Added ``parse_file`` method for parsing data from a file-like
