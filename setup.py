@@ -25,7 +25,7 @@ except ImportError:
     from distutils.core import setup
 
 def read(*rnames):
-    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+    return open(os.path.join(*rnames)).read()
 
 setup(
     name = "rdfadict",
