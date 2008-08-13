@@ -1,6 +1,14 @@
 Change History
 **************
 
+0.5.1 (unreleased)
+==================
+
+* Added ``parse_file`` method for parsing data from a file-like
+  object.
+* ``parseurl`` and ``parsestring`` are now aliased to ``parse_url``
+  and ``parse_string`` respectively.
+
 0.5 (2008-08-12)
 ================
 

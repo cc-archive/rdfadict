@@ -32,7 +32,7 @@ Triples can be extracted using **rdfadict**:
   >>> import rdfadict
   >>> base_uri = "http://example.com/rdfadict/"
   >>> parser = rdfadict.RdfaParser()
-  >>> triples = parser.parsestring(rdfa_sample, base_uri)
+  >>> triples = parser.parse_string(rdfa_sample, base_uri)
 
 We define the variable ``base_uri`` to let the parser know what URI assertions
 without subjects apply to.  
@@ -86,7 +86,7 @@ In this statement we are making three assertions: two involving URI objects
   >>> import rdfadict
   >>> parser = rdfadict.RdfaParser()
   >>> multi_base_uri = "http://example.com/multiassert/"
-  >>> triples = parser.parsestring(multi_rdfa, multi_base_uri)
+  >>> triples = parser.parse_string(multi_rdfa, multi_base_uri)
 
 We expect the triples generated to have two subjects: the photo URI (for the 
 ``rel`` and ``property`` assertions) and the ``href`` URI (for the ``rev``
@@ -146,7 +146,7 @@ We can extract RDFa triples from it:
 
   >>> parser = rdfadict.RdfaParser()
   >>> base_uri2 = "http://example.com/rdfadict/sample2"
-  >>> triples = parser.parsestring(rdfa_sample2, base_uri2)
+  >>> triples = parser.parse_string(rdfa_sample2, base_uri2)
 
 This block of RDFa includes a license statement about another document, the
 photo:
@@ -190,7 +190,7 @@ http://example.com.  This can be tested; note we supply a different
 
   >>> parser = rdfadict.RdfaParser()
   >>> link_base_uri = 'http://example.com/foo'
-  >>> triples = parser.parsestring(link_sample, link_base_uri)
+  >>> triples = parser.parse_string(link_sample, link_base_uri)
 
   >>> triples.keys()
   ['http://example.com/']
@@ -214,7 +214,7 @@ is omitted, rdfadict is resolves the subject to the explicit base URI.
   ... </div>"""
   >>> parser = rdfadict.RdfaParser()
   >>> link_base_uri = 'http://example.com/foo'
-  >>> triples = parser.parsestring(link_sample, link_base_uri)
+  >>> triples = parser.parse_string(link_sample, link_base_uri)
   >>> link_base_uri in triples.keys()
   True
 
@@ -224,12 +224,36 @@ If a namespace is unable to be resolved, the assertion is ignored.
   ... <a href="http://example.com/foo" rel="foo:bar">Content</a>
   ... """
   >>> parser = rdfadict.RdfaParser()
-  >>> triples = parser.parsestring(ns_sample, 'http://example.com/bob')
+  >>> triples = parser.parse_string(ns_sample, 'http://example.com/bob')
   >>> triples
   {}
 
 See the `RDFa Primer <http://www.w3.org/2006/07/SWD/RDFa/primer/>`_
 for more RDFa examples.
+
+Parsing Files
+=============
+
+**rdfadict** can parse from three sources: URLs, file-like objects, or
+strings.  The examples thus far have parsed strings using the
+``parse_string`` method.  A file-like object can also be used:
+
+   >>> from StringIO import StringIO
+   >>> file_sample = """
+   ... <html>
+   ...  <body>
+   ...    <a href="http://creativecommons.org/licenses/by/3.0/"
+   ...       rel="license">the license</a>
+   ...  </body>
+   ... </html>
+   ... """
+   >>> parser = rdfadict.RdfaParser()
+   >>> result = parser.parse_file(StringIO(file_sample),
+   ...                            "http://creativecommons.org")
+   >>> result.keys()
+   ['http://creativecommons.org']
+   >>> result['http://creativecommons.org']
+   {'http://www.w3.org/1999/xhtml/vocab#license': ['http://creativecommons.org/licenses/by/3.0/']}
 
 
 Triple Sinks
@@ -255,7 +279,7 @@ example:
 
    >>> parser = rdfadict.RdfaParser()
    >>> list_sink = rdfadict.sink.SimpleTripleSink()
-   >>> result = parser.parsestring(rdfa_sample, base_uri, sink=list_sink)
+   >>> result = parser.parse_string(rdfa_sample, base_uri, sink=list_sink)
 
    >>> result is list_sink
    True
