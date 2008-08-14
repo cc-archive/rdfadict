@@ -29,7 +29,7 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.5.1",
+    version = "0.5.3",
     packages = ['rdfadict'],
     package_dir = {'':'src'},
 
