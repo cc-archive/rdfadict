@@ -18,7 +18,7 @@
 ## FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ## DEALINGS IN THE SOFTWARE.
 
-import urllib
+import urllib2
 import urlparse
 from cStringIO import StringIO
 
@@ -45,7 +45,7 @@ class RdfaParser(object):
 
         return sink
 
-    def parsestring(self, in_string, base_uri, sink=None):
+    def parse_string(self, in_string, base_uri, sink=None):
 
         # extract the RDFa using pyRdfa
         stream = StringIO(in_string)
@@ -60,12 +60,31 @@ class RdfaParser(object):
         del graph
 
         return sink
+    parsestring = parse_string
 
-    def parseurl(self, url, sink=None):
+    def parse_url(self, url, sink=None):
         """Retrieve a URL and parse RDFa contained within it."""
 
         # extract the RDFa using pyRdfa
-        graph = pyrdfa.processFile(urllib.urlopen(url), base=url)
+        graph = pyrdfa.processURI(url, None)
+
+        # see if a default sink is required
+        if sink is None:
+            sink = DictTripleSink()
+
+        # transform from graph to sink
+        self._graph_to_sink(graph, sink)
+        del graph
+
+        return sink
+    parseurl = parse_url
+
+    def parse_file(self, file_obj, base_url, sink=None):
+        """Retrieve the contents of a file-like onject and parse the 
+        RDFa contained within it."""
+
+        # extract the RDFa using pyRdfa
+        graph = pyrdfa.processFile(file_obj, base=base_url)
 
         # see if a default sink is required
         if sink is None:

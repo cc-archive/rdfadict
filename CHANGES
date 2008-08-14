@@ -1,6 +1,20 @@
 Change History
 **************
 
+0.5.2 (2008-08-14)
+==================
+
+* Corrected bug with parse_url; non-XHTML sources will now be parsed
+  correctly.
+
+0.5.1 (2008-08-13)
+==================
+
+* Added ``parse_file`` method for parsing data from a file-like
+  object.
+* ``parseurl`` and ``parsestring`` are now aliased to ``parse_url``
+  and ``parse_string`` respectively.
+
 0.5 (2008-08-12)
 ================
 
