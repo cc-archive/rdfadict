@@ -255,6 +255,11 @@ strings.  The examples thus far have parsed strings using the
    >>> result['http://creativecommons.org']
    {'http://www.w3.org/1999/xhtml/vocab#license': ['http://creativecommons.org/licenses/by/3.0/']}
 
+Note that ``parse_file`` is not recommended for use with ``urllib2``
+handler objects.  In the event that pyRdfa encounters a non-XHTML
+source, it re-opens the URL to begin processing with a more tolerant
+parser.  When ``parse_file`` is used to initiate parsing, it is unable
+to re-open the URL correctly.
 
 Triple Sinks
 ============

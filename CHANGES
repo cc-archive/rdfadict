@@ -1,6 +1,12 @@
 Change History
 **************
 
+0.5.2 (2008-08-14)
+==================
+
+* Corrected bug with parse_url; non-XHTML sources will now be parsed
+  correctly.
+
 0.5.1 (2008-08-13)
 ==================
 

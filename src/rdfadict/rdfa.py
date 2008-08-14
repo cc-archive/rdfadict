@@ -65,14 +65,18 @@ class RdfaParser(object):
     def parse_url(self, url, sink=None):
         """Retrieve a URL and parse RDFa contained within it."""
 
-        # construct a request and open it
-        opener = urllib2.build_opener()
-        request = urllib2.Request(url)
-        request.add_header('User-Agent',
-                 'Python rdfadict/0.5.1 http://pypi.python.org/pypi/rdfadict')
+        # extract the RDFa using pyRdfa
+        graph = pyrdfa.processURI(url, None)
 
-        # delegate to parse_file
-        return parse_file(opener.open(request), url, sink=sink)
+        # see if a default sink is required
+        if sink is None:
+            sink = DictTripleSink()
+
+        # transform from graph to sink
+        self._graph_to_sink(graph, sink)
+        del graph
+
+        return sink
     parseurl = parse_url
 
     def parse_file(self, file_obj, base_url, sink=None):
