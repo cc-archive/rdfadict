@@ -20,6 +20,12 @@
 
 """Simple triple Sink objects."""
 
+import sys
+
+if sys.version < (2,5):
+    # import set support
+    from sets import Set as set
+
 class SimpleTripleSink(list):
     """A bare-bones Triple sink that just stores them as a list of tuples."""
 
@@ -34,3 +40,11 @@ class DictTripleSink(dict):
 
         self.setdefault(str(s), {}).setdefault(str(p), [])
         self[str(s)][str(p)].append(str(o))
+
+class DictSetTripleSink(dict):
+
+    def triple(self, s, p, o):
+        """Add a triple [s, p, o] to the triple dictionary."""
+
+        self.setdefault(str(s), {}).setdefault(str(p), set())
+        self[str(s)][str(p)].add(str(o))
