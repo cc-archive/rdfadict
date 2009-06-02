@@ -5,7 +5,7 @@ Change History
 ================
 
 * DictTripleSink uses ``encode`` instead of ``str``, making it
-friendlier to Unicode.
+  friendlier to Unicode.
 * Eliminated custom pyRDFa wrapper.
 * Added a test for handling Unicode triples. 
 
