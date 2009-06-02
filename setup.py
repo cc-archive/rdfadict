@@ -29,7 +29,7 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.6",
+    version = "0.6.1",
     packages = ['rdfadict'],
     package_dir = {'':'src'},
 
@@ -46,10 +46,11 @@ setup(
     install_requires = ['setuptools',
                         'rdflib==2.4.0',
                         'html5lib',
-                        'pyRdfa',
+                        'pyRdfa>=2.3.4',
                         ],
     dependency_links = [
-        'http://dev.w3.org/2004/PythonLib-IH/dist/pyRdfa-2.0.tar.gz',],
+        'http://dev.w3.org/2004/PythonLib-IH/dist/pyRdfa-2.3.4.tar.gz',
+        ],
 
     include_package_data = True,
     zip_safe = True,
