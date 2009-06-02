@@ -44,7 +44,7 @@ setup(
         },
     
     install_requires = ['setuptools',
-                        'rdflib==2.4.0',
+                        'rdflib',
                         'html5lib',
                         'pyRdfa>=2.3.4',
                         ],
