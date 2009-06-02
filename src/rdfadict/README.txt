@@ -255,6 +255,19 @@ strings.  The examples thus far have parsed strings using the
    >>> result['http://creativecommons.org']
    {'http://www.w3.org/1999/xhtml/vocab#license': ['http://creativecommons.org/licenses/by/3.0/']}
 
+Parsing By URL
+==============
+
+**rdfadict** can parse a document retrievable by URI.  Behind the
+scenes it uses ``urllib2`` to open the document.  
+
+  >>> parser = rdfadict.RdfaParser()
+  >>> result = \
+  ... parser.parse_url('http://creativecommons.org/licenses/by/2.1/jp/')
+  >>> print result['http://creativecommons.org/licenses/by/2.1/jp/']\
+  ... ['http://purl.org/dc/elements/1.1/title'][0]
+  表示 2.1 日本
+
 Note that ``parse_file`` is not recommended for use with ``urllib2``
 handler objects.  In the event that pyRdfa encounters a non-XHTML
 source, it re-opens the URL to begin processing with a more tolerant
