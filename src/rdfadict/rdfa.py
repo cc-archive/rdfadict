@@ -21,8 +21,12 @@
 import urllib2
 import urlparse
 from cStringIO import StringIO
+import xml.dom.minidom
 
-import rdfadict.pyrdfa as pyrdfa
+#import rdfadict.pyrdfa as pyrdfa
+import pyRdfa
+import html5lib
+from html5lib import treebuilders
 
 from rdfadict.sink import DictTripleSink
 
@@ -45,11 +49,38 @@ class RdfaParser(object):
 
         return sink
 
+    def _make_dom(self, input_string):
+        """Given an input_string containing [X]HTML, return a tuple of
+        (dom, options).  If input_string is valid XML, xml.dom.minidom is 
+        used to perform the parsing.  If input_string is not valid XML,
+        fall back to using html5lib for creating the DOM.
+
+        input_string is wrapped in StringIO so we can easily reset in the
+        event of errors."""
+
+        options = pyRdfa.Options()
+
+        try:
+            # try to parse as XML
+            dom = xml.dom.minidom.parse(StringIO(input_string))
+
+        except:
+            # fall back to html5lib
+            parser = html5lib.HTMLParser(
+                tree=treebuilders.getTreeBuilder("dom"))
+
+            dom = parser.parse(input_string, encoding='utf-8')
+
+            # The host language has changed
+            options.host_language = pyRdfa.HTML5_RDFA
+
+        return dom, options
+        
     def parse_string(self, in_string, base_uri, sink=None):
 
         # extract the RDFa using pyRdfa
-        stream = StringIO(in_string)
-        graph = pyrdfa.processFile(stream, base=base_uri)
+        dom, options = self._make_dom(in_string)
+        graph = pyRdfa.parseRDFa(dom, base_uri, options=options)
 
         # see if a default sink is required
         if sink is None:
@@ -65,33 +96,16 @@ class RdfaParser(object):
     def parse_url(self, url, sink=None):
         """Retrieve a URL and parse RDFa contained within it."""
 
-        # extract the RDFa using pyRdfa
-        graph = pyrdfa.processURI(url, None)
+        url_contents = urllib2.urlopen(url)
+        return self.parse_string(url_contents, url, sink)
 
-        # see if a default sink is required
-        if sink is None:
-            sink = DictTripleSink()
-
-        # transform from graph to sink
-        self._graph_to_sink(graph, sink)
-        del graph
-
-        return sink
     parseurl = parse_url
 
     def parse_file(self, file_obj, base_url, sink=None):
-        """Retrieve the contents of a file-like onject and parse the 
+        """Retrieve the contents of a file-like object and parse the 
         RDFa contained within it."""
 
-        # extract the RDFa using pyRdfa
-        graph = pyrdfa.processFile(file_obj, base=base_url)
-
-        # see if a default sink is required
-        if sink is None:
-            sink = DictTripleSink()
-
-        # transform from graph to sink
-        self._graph_to_sink(graph, sink)
-        del graph
+        file_contents = file_obj.read()
+        return self.parse_string(file_contents, base_url, sink)
 
         return sink
