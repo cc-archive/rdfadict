@@ -46,5 +46,5 @@ class DictSetTripleSink(dict):
     def triple(self, s, p, o):
         """Add a triple [s, p, o] to the triple dictionary."""
 
-        self.setdefault(str(s), {}).setdefault(str(p), set())
-        self[str(s)][str(p)].add(str(o))
+        self.setdefault(unicode(s), {}).setdefault(unicode(p), set())
+        self[unicode(s)][unicode(p)].add(unicode(o))
