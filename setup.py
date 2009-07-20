@@ -1,4 +1,4 @@
-## Copyright (c) 2006-2008 Nathan R. Yergler, Creative Commons
+## Copyright (c) 2006-2009 Nathan R. Yergler, Creative Commons
 
 ## Permission is hereby granted, free of charge, to any person obtaining
 ## a copy of this software and associated documentation files (the "Software"),
@@ -29,7 +29,7 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.7",
+    version = "0.7.1",
     packages = ['rdfadict'],
     package_dir = {'':'src'},
 
