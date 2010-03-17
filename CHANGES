@@ -1,6 +1,13 @@
 Change History
 **************
 
+
+0.7.1.1 (2010-03-17)
+====================
+
+* Added missing MANIFEST.in, which prevented setup.py from working
+  when run from an sdist (as opposed to a checkout).
+
 0.7.1 (2009-07-20)
 ==================
 

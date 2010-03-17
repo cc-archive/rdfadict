@@ -1,0 +1,3 @@
+include README
+include CHANGES
+recursive-include src *.txt
