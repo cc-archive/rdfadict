@@ -38,8 +38,8 @@ class DictTripleSink(dict):
     def triple(self, s, p, o):
         """Add a triple [s, p, o] to the triple dictionary."""
 
-        self.setdefault(s.encode(), {}).setdefault(p.encode(), [])
-        self[s.encode()][p.encode()].append(o.encode())
+        self.setdefault(s.encode('utf-8'), {}).setdefault(p.encode('utf-8'), [])
+        self[s.encode('utf-8')][p.encode('utf-8')].append(o.encode('utf-8'))
 
 class DictSetTripleSink(dict):
 
