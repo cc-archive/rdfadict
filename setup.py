@@ -29,8 +29,8 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.7.1.1",
-    packages = ['rdfadict'],
+    version = "0.7.2",
+    packages = ['rdfadict', 'rdfadict.sink', 'rdfadict.tests',],
     package_dir = {'':'src'},
 
     entry_points = {
