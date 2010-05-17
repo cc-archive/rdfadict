@@ -44,12 +44,12 @@ setup(
         },
     
     install_requires = ['setuptools',
-                        'rdflib',
+                        'rdflib<3.0',
                         'html5lib',
                         'pyRdfa>=2.3.4',
                         ],
     dependency_links = [
-        'http://dev.w3.org/2004/PythonLib-IH/dist/pyRdfa-2.3.4.tar.gz',
+        'http://dev.w3.org/2004/PythonLib-IH/dist/pyRdfa-2.3.7.tar.gz',
         ],
 
     include_package_data = True,
