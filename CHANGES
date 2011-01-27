@@ -1,6 +1,11 @@
 Change History
 **************
 
+0.7.3 (2011-01-27)
+==================
+
+* Corrected minor bug; the Sets modules was imported in all cases,
+  resulting in a DeprecationWarning.
 
 0.7.1.1 (2010-03-17)
 ====================
