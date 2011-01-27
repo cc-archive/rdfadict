@@ -22,7 +22,7 @@
 
 import sys
 
-if sys.version < (2,5):
+if sys.version_info < (2,5):
     # import set support
     from sets import Set as set
 
