@@ -1,4 +1,5 @@
 """Test harness for running the Task Force RDFa tests against rdfadict."""
+from __future__ import print_function
 
 import sys
 import new
@@ -62,7 +63,7 @@ class TaskForceTest(unittest.TestCase):
         import rdfadict
         import rdfadict.sink.graph
 
-        print self._uri
+        print(self._uri)
 
         # set up our target sink
         g = Graph()
@@ -75,7 +76,7 @@ class TaskForceTest(unittest.TestCase):
         # execute the test SPARQL
         g.query(self._result)
 
-        print g.selected
+        print(g.selected)
         # self.assert_(test.execute(g).get_boolean())
 
 def test_suite():

@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 ## Copyright (c) 2006-2007 Nathan R. Yergler, Creative Commons
 
 ## Permission is hereby granted, free of charge, to any person obtaining
@@ -18,7 +20,7 @@
 ## FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ## DEALINGS IN THE SOFTWARE.
 
-from rdfa import RdfaParser
+from .rdfa import RdfaParser
 
 def extract(text, url, graph):
     """ccrdf.extract_to_graph entry point for providing RDFa extraction
@@ -35,6 +37,6 @@ if __name__ == '__main__':
     
     parser = RdfaParser()
     triples = parser.parseurl("http://rdfa.info")
-    print triples
+    print(triples)
     
     
