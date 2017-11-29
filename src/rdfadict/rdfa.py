@@ -1,3 +1,6 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 ## Copyright (c) 2006-2008 Nathan R. Yergler, Creative Commons
 
 ## Permission is hereby granted, free of charge, to any person obtaining
@@ -18,9 +21,9 @@
 ## FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ## DEALINGS IN THE SOFTWARE.
 
-import urllib2
-import urlparse
-from cStringIO import StringIO
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
+from io import StringIO
 import xml.dom.minidom
 
 #import rdfadict.pyrdfa as pyrdfa
@@ -96,7 +99,7 @@ class RdfaParser(object):
     def parse_url(self, url, sink=None):
         """Retrieve a URL and parse RDFa contained within it."""
 
-        url_contents = urllib2.urlopen(url)
+        url_contents = urllib.request.urlopen(url)
         return self.parse_string(url_contents, url, sink)
 
     parseurl = parse_url

@@ -19,6 +19,7 @@
 ## DEALINGS IN THE SOFTWARE.
 
 """Simple triple Sink objects."""
+from builtins import str
 
 import sys
 
@@ -46,5 +47,5 @@ class DictSetTripleSink(dict):
     def triple(self, s, p, o):
         """Add a triple [s, p, o] to the triple dictionary."""
 
-        self.setdefault(unicode(s), {}).setdefault(unicode(p), set())
-        self[unicode(s)][unicode(p)].add(unicode(o))
+        self.setdefault(str(s), {}).setdefault(str(p), set())
+        self[str(s)][str(p)].add(str(o))

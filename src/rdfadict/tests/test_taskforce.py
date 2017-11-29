@@ -1,10 +1,13 @@
 """Test harness for running the Task Force RDFa tests against rdfadict."""
 from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 
 import sys
 import new
 import unittest
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import string
 import logging
 
@@ -50,7 +53,7 @@ class TaskForceTest(unittest.TestCase):
         self._description = str(description)
 
         self._source = str(source)
-        self._result = urllib2.urlopen(str(result)).read()
+        self._result = urllib.request.urlopen(str(result)).read()
 
     def id(self):
         return self._name

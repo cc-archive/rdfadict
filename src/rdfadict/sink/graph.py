@@ -19,6 +19,7 @@
 ## DEALINGS IN THE SOFTWARE.
 
 """Triple sinks which support adding to RDF graphs."""
+from builtins import object
 
 class GraphSink(object):
     """A triple sink which adds new triples to an existing rdflib graph."""
