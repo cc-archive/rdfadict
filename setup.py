@@ -1,4 +1,5 @@
 ## Copyright (c) 2006-2009 Nathan R. Yergler, Creative Commons
+## Copyright (c) 2017 Creative Commons Corporation
 
 ## Permission is hereby granted, free of charge, to any person obtaining
 ## a copy of this software and associated documentation files (the "Software"),
@@ -29,7 +30,7 @@ def read(*rnames):
 
 setup(
     name = "rdfadict",
-    version = "0.7.5",
+    version = "0.8.0",
     packages = ['rdfadict', 'rdfadict.sink', 'rdfadict.tests',],
     package_dir = {'':'src'},
 
@@ -37,19 +38,20 @@ setup(
         'ccrdf.extract_to_graph': [
             'rdfa = rdfadict:extract [ccrdf]',
             ],
-        
+
         'console_scripts' : [
             'tf_test = rdfadict.tests.test_taskforce:cli',
             ]
         },
-    
+
     install_requires = ['setuptools',
-                        'rdflib<3.0',
-                        'html5lib',
-                        'pyRdfa>=2.3.4',
+                        'rdflib',
+                        # For pyRdfa3 - see their github repo README
+                        'html5lib<=0.95',
+                        'pyRdfa',
                         ],
     dependency_links = [
-        'http://dev.w3.org/2004/PythonLib-IH/dist/pyRdfa-2.3.7.tar.gz',
+        'https://github.com/RDFLib/pyrdfa3/tarball/master#egg=pyRdfa',
         ],
 
     include_package_data = True,
@@ -62,7 +64,7 @@ setup(
          read('README')
          + '\n' +
          read('src', 'rdfadict', 'README.txt')
-         + '\n' + 
+         + '\n' +
          read('CHANGES')
          + '\n' +
          'Download\n'

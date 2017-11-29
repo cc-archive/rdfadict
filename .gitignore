@@ -1,0 +1,8 @@
+*~
+.eggs
+bin
+include
+lib
+local
+share
+src/rdfadict.egg-info
