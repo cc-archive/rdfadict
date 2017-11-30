@@ -12,12 +12,11 @@ import string
 import logging
 
 from rdflib import ConjunctiveGraph as Graph
-from rdflib.sparql.parser import doSPARQL
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
 
-MANIFESTS =[ 
+MANIFESTS =[
     "http://www.w3.org/2006/07/SWD/RDFa/testsuite/xhtml1-testcases/rdfa-xhtml1-test-manifest.rdf",
     ]
 
@@ -40,7 +39,7 @@ def py_name(input):
     """Take a string and return a valid Python identifier."""
 
     input = input.replace(' ', '_')
-    return "".join([c for c in input if c in 
+    return "".join([c for c in input if c in
                     string.ascii_letters + '_' + string.digits])
 
 class TaskForceTest(unittest.TestCase):
@@ -75,7 +74,7 @@ class TaskForceTest(unittest.TestCase):
         # run rdfadict over the input
         parser = rdfadict.RdfaParser()
         parser.parseurl(self._source, sink)
-        
+
         # execute the test SPARQL
         g.query(self._result)
 
@@ -126,18 +125,18 @@ def get_test(uri):
     return None
 
 def cli():
-    """Command line interface for retrieving and running a Task Force 
+    """Command line interface for retrieving and running a Task Force
     tests.  If run without command line parameters, runs all available
     tests; if run with a single URI, attempts to retrieve that test from
     known manifests."""
 
-    if len(sys.argv) > 1: 
-        # running a single test 
-        test_uri = sys.argv[-1] 
+    if len(sys.argv) > 1:
+        # running a single test
+        test_uri = sys.argv[-1]
         test = get_test(test_uri)
 
-        LOG.debug("Retrieved test %s" % test_uri) 
-    else: 
+        LOG.debug("Retrieved test %s" % test_uri)
+    else:
         test = test_suite()
 
     unittest.TextTestRunner().run(test)
@@ -145,4 +144,4 @@ def cli():
     LOG.info("Done.")
 
 if __name__ == '__main__':
-    all()
+    cli()

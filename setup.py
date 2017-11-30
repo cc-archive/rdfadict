@@ -49,6 +49,8 @@ setup(
                         # For pyRdfa3 - see their github repo README
                         'html5lib<=0.95',
                         'pyRdfa',
+                        # Moving from Python 2 to Python 3
+                        'future',
                         ],
     dependency_links = [
         'https://github.com/RDFLib/pyrdfa3/tarball/master#egg=pyRdfa',

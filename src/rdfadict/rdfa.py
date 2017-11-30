@@ -38,7 +38,7 @@ class SubjectResolutionError(AttributeError):
     specified node."""
 
 class RdfaParser(object):
-        
+
     def reset(self):
         """Reset the parser, forgetting about b-nodes, etc."""
 
@@ -54,7 +54,7 @@ class RdfaParser(object):
 
     def _make_dom(self, input_string):
         """Given an input_string containing [X]HTML, return a tuple of
-        (dom, options).  If input_string is valid XML, xml.dom.minidom is 
+        (dom, options).  If input_string is valid XML, xml.dom.minidom is
         used to perform the parsing.  If input_string is not valid XML,
         fall back to using html5lib for creating the DOM.
 
@@ -75,15 +75,16 @@ class RdfaParser(object):
             dom = parser.parse(input_string, encoding='utf-8')
 
             # The host language has changed
-            options.host_language = pyRdfa.HTML5_RDFA
+            options.host_language = pyRdfa.host.HostLanguage.html5
 
         return dom, options
-        
+
     def parse_string(self, in_string, base_uri, sink=None):
 
         # extract the RDFa using pyRdfa
         dom, options = self._make_dom(in_string)
-        graph = pyRdfa.parseRDFa(dom, base_uri, options=options)
+        pyrdf_obj = pyRdfa.pyRdfa(options=options, base=base_uri)
+        graph = pyrdf_obj.graph_from_DOM(dom)
 
         # see if a default sink is required
         if sink is None:
@@ -105,7 +106,7 @@ class RdfaParser(object):
     parseurl = parse_url
 
     def parse_file(self, file_obj, base_url, sink=None):
-        """Retrieve the contents of a file-like object and parse the 
+        """Retrieve the contents of a file-like object and parse the
         RDFa contained within it."""
 
         file_contents = file_obj.read()
