@@ -53,6 +53,7 @@ setup(
                         ],
     dependency_links = [
         'https://github.com/RDFLib/pyrdfa3/tarball/master#egg=pyRdfa',
+        'https://github.com/creativecommons/html5lib/tarball/master#egg=html5lib',
         ],
 
     include_package_data = True,
