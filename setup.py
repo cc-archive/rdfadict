@@ -46,8 +46,7 @@ setup(
 
     install_requires = ['setuptools',
                         'rdflib',
-                        # For pyRdfa3 - see their github repo README
-                        'html5lib<=0.95',
+                        'html5lib',
                         'pyRdfa',
                         # Moving from Python 2 to Python 3
                         'future',
