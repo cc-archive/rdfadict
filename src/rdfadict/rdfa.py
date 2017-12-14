@@ -72,7 +72,7 @@ class RdfaParser(object):
             parser = html5lib.HTMLParser(
                 tree=treebuilders.getTreeBuilder("dom"))
 
-            dom = parser.parse(input_string, encoding='utf-8')
+            dom = parser.parse(input_string)
 
             # The host language has changed
             options.host_language = pyRdfa.host.HostLanguage.html5
