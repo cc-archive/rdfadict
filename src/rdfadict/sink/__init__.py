@@ -27,6 +27,8 @@ if sys.version_info < (2,5):
     # import set support
     from sets import Set as set
 
+#FIXME: Decide where we really need to call str()
+
 class SimpleTripleSink(list):
     """A bare-bones Triple sink that just stores them as a list of tuples."""
 
@@ -39,8 +41,8 @@ class DictTripleSink(dict):
     def triple(self, s, p, o):
         """Add a triple [s, p, o] to the triple dictionary."""
 
-        self.setdefault(s.encode('utf-8'), {}).setdefault(p.encode('utf-8'), [])
-        self[s.encode('utf-8')][p.encode('utf-8')].append(o.encode('utf-8'))
+        self.setdefault(str(s), {}).setdefault(str(p), [])
+        self[str(s)][str(p)].append(str(o))
 
 class DictSetTripleSink(dict):
 
