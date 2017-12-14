@@ -69,7 +69,8 @@ class RdfaParser(object):
 
         except:
             # fall back to html5lib
-            parser = html5lib.HTMLParser('dom')
+            parser = html5lib.HTMLParser(
+                html5lib.treebuilders.getTreeBuilder('dom'))
 
             dom = parser.parse(input_string)
 
