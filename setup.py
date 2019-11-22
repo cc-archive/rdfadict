@@ -55,7 +55,7 @@ setup(
     author="Nathan R. Yergler",
     author_email="nathan@creativecommons.org",
     description="An RDFa parser wth a simple dictionary-like interface.",
-    long_description=(read("README") + "\n" +
+    long_description=(read("README.rst") + "\n" +
                       read("src", "rdfadict", "README.txt") + "\n" +
                       read("CHANGES") + "\n" +
                       "Download\n" +
