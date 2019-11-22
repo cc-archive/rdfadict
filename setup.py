@@ -43,11 +43,11 @@ setup(
             "tf_test = rdfadict.tests.test_taskforce:cli"]},
 
     install_requires=["html5lib",
-                      "pyRdfa==3.0.4",
+                      "pyRdfa>=2.3.4",
                       "rdflib",
                       "setuptools"],
-    dependency_links=[("https://github.com/RDFLib/PyRDFa/archive/"
-                       "citable-release.tar.gz#egg=pyRdfa-3.0.4"), ],
+    dependency_links=[
+        "https://github.com/RDFLib/PyRDFa/archive/citable-release.tar.gz"],
 
     include_package_data=True,
     zip_safe=True,
