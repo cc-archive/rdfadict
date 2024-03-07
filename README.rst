@@ -22,6 +22,8 @@ rdfadict
    licensed to the public under the `MIT license 
    <http://opensource.org/licenses/mit-license.php>`_.
 
+An RDFa parser wth a simple dictionary-like interface.
+
 .. contents::
 
 Installation
