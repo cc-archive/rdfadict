@@ -26,6 +26,15 @@ An RDFa parser wth a simple dictionary-like interface.
 
 .. contents::
 
+
+ccEngine
+********
+
+This repository is part of the ccEngine: `cc-archive/cc.engine`_.
+
+.. _`cc-archive/cc.engine`: https://github.com/cc-archive/cc.engine
+
+
 Installation
 ************
 
